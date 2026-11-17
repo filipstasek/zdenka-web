@@ -5,8 +5,8 @@ robí, ako je postavený a prečo je postavený práve tak**. Časť „Vedomé
 rozhodnutia" je najdôležitejšia — sú tam veci, ktoré vyzerajú ako chyba, ale
 chyba to nie je.
 
-Stav k: **zdenka-theme 3.48.0 · property-pro-plugin 5.62 · zc-newsletter 1.23.0
-· zc-reviews 1.6.4 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.2**
+Stav k: **zdenka-theme 3.49.0 · property-pro-plugin 5.63 · zc-newsletter 1.23.0
+· zc-reviews 1.7.0 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.3**
 
 ---
 
@@ -36,7 +36,7 @@ majú zmenšené kópie (viď §9).
 | `zdenka-theme` | 5 835 | vzhľad, šablóny stránok, editovateľné texty, nástroje pre webmastera |
 | `property-pro-plugin` | 8 489 | nehnuteľnosti, realitný panel, CRM, zálohy, denník |
 | `zc-newsletter` | 3 405 | odberatelia, kategórie, rozposielanie, šablóny e-mailov |
-| `zc-reviews` | 1 387 | recenzie vrátane importu z Google |
+| `zc-reviews` | 1 387 | recenzie; tie z Google sa pridávajú ručne (bez API) |
 | `zc-ebook` | 603 | PDF lead-magnet |
 | `zc-2fa` | 1 107 | dvojfaktorové prihlásenie |
 | `zc-installer` | 197 | nainštaluje všetky priložené balíky naraz (klient ho nepoužíva) |
@@ -61,7 +61,9 @@ verzii, len zobrazí výzvu na aktualizáciu. **Toto pravidlo dodržiavať.**
   status ENUM('pending','active','unsubscribed'), token, source,
   subscribed_at, confirmed_at`. `interest` je **zoznam kľúčov oddelený
   čiarkou**, prázdna hodnota = „všetko".
-- `{prefix}zc_reviews` — recenzie.
+- `{prefix}zc_reviews` — recenzie. Stĺpec `source` = `own|google`. Pri existujúcej
+  tabuľke ho dopĺňa `zcr_ensure_source_column()` cez ALTER — `dbDelta` to
+  nespraví, lebo schéma používa `CREATE TABLE IF NOT EXISTS`.
 - `{prefix}zc_audit` — bezpečnostný denník.
 
 **Roly**
@@ -99,7 +101,7 @@ nastavenia po celom WordPresse. Vyžaduje `manage_options`.
 | Stránky a údržba | režim údržby, zapínanie stránok |
 | Notifikácie | komu chodia dopyty z formulárov |
 | Newsletter | odberatelia, kategórie, rozosielanie, história |
-| Recenzie / Recenzie z Google | správa a import |
+| Recenzie | správa recenzií vrátane tých z Google (zdroj „Google") |
 | Ebook | lead-magnet |
 | Indexovanie | diagnostika presmerovaní pre Search Console |
 | Zabezpečenie (2FA) | |
@@ -274,6 +276,7 @@ textom v hero. Bodky pod carouselmi majú `aria-label`.
 | **Newsletter bez potvrdzovacieho kroku** | Rozhodnutie klienta, riziko popísané v §6. |
 | **Ikony sietí v navbare sú zlaté, nie farebné** | Skúšali sa firemné farby sietí, maklérke sa nepáčili. Triedy `zc-soc-{sieť}` v značke ostali, návrat je jeden blok CSS. |
 | **Do meta sa ukladá názov, nie kľúč** | Historické, viaže sa na to filtrovanie. Rieši to §7. |
+| **Recenzie z Google sú ručné, žiadne Places API** | Places API je dnes len s aktívnym billingom a vracalo najviac 5 recenzií. Recenzia so zdrojom `google` dostane na webe značku „Recenzia z Google". Posledné stiahnuté recenzie sa pri aktualizácii jednorazovo preniesli do databázy a API kľúč sa zmazal. **Napojenie nevracať** bez súhlasu klienta. |
 | **Sekcia „Čo ma riadi pri práci" je vypnutá** | Po hero idú rovno nehnuteľnosti. Zapína sa v *Prispôsobiť → Úvodná stránka – sekcie*. |
 | **Spracovanie formulárov v administrácii beží na `admin_init`** | Aby sa dalo presmerovať (PRG). Vo vykresľovacej funkcii sú hlavičky už odoslané — preto tam kedysi nefungoval ani CSV export, ani hláška po pridaní kontaktu. |
 

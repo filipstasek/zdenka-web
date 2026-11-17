@@ -10,11 +10,6 @@ function zcr_display_order() {
     $v = get_option('zcr_display_order', 'manual');
     return in_array($v, ['manual', 'newest', 'rating', 'random'], true) ? $v : 'manual';
 }
-// Kam zaradiť recenzie z Google: after | before | mixed
-function zcr_google_position() {
-    $v = get_option('zcr_google_position', 'after');
-    return in_array($v, ['after', 'before', 'mixed'], true) ? $v : 'after';
-}
 
 /** SQL časť ORDER BY podľa zvoleného spôsobu radenia. */
 function zcr_order_sql() {
@@ -128,8 +123,6 @@ function zcr_disp_save_endpoint() {
     check_admin_referer('zcr_disp', 'zcr_disp_nonce');
     $o = sanitize_key($_POST['display_order'] ?? 'manual');
     update_option('zcr_display_order', in_array($o, ['manual','newest','rating','random'], true) ? $o : 'manual');
-    $p = sanitize_key($_POST['google_position'] ?? 'after');
-    update_option('zcr_google_position', in_array($p, ['after','before','mixed'], true) ? $p : 'after');
 
     $back = wp_get_referer() ?: admin_url('admin.php?page=zc-reviews');
     wp_safe_redirect(add_query_arg('zcr_disp_ok', '1', remove_query_arg('zcr_disp_ok', $back)));
@@ -151,13 +144,6 @@ function zcr_display_settings_box() {
                     <option value="newest" <?php selected(zcr_display_order(), 'newest'); ?>>Najnovšie prvé</option>
                     <option value="rating" <?php selected(zcr_display_order(), 'rating'); ?>>Najlepšie hodnotené prvé</option>
                     <option value="random" <?php selected(zcr_display_order(), 'random'); ?>>Náhodne pri každom načítaní</option>
-                </select>
-            </label>
-            <label>Recenzie z Google
-                <select name="google_position">
-                    <option value="after"  <?php selected(zcr_google_position(), 'after');  ?>>Zaradiť za vlastné</option>
-                    <option value="before" <?php selected(zcr_google_position(), 'before'); ?>>Zaradiť pred vlastné</option>
-                    <option value="mixed"  <?php selected(zcr_google_position(), 'mixed');  ?>>Premiešať podľa hodnotenia</option>
                 </select>
             </label>
             <button type="submit" name="zcr_disp_save" value="1" class="zcr-disp-btn">Uložiť</button>

@@ -2,8 +2,9 @@
 defined('ABSPATH') || exit;
 
 /**
- * Všetky zverejnené recenzie (vlastné + Google, ak je firma napojená)
- * zoradené podľa nastavenia. Používa to shortcode aj šablóna Referencie.
+ * Všetky zverejnené recenzie zoradené podľa nastavenia – vlastné aj tie
+ * z Google (tie sa pridávajú ručne so zdrojom „google"). Používa to
+ * shortcode aj šablóna Referencie.
  */
 function zcr_public_reviews($limit = 500) {
     global $wpdb;
@@ -13,23 +14,7 @@ function zcr_public_reviews($limit = 500) {
         "SELECT * FROM " . zcr_table() . " WHERE published=1 ORDER BY {$order} LIMIT %d",
         $limit
     ));
-    $rows = $rows ?: [];
-
-    // Recenzie z Google firmy (ak je napojená) – zaradenie podľa nastavenia
-    if (function_exists('zcr_google_enabled') && zcr_google_enabled()) {
-        $g   = zcr_google_fetch();
-        $pos = function_exists('zcr_google_position') ? zcr_google_position() : 'after';
-        if ($pos === 'before') {
-            $rows = array_merge($g, $rows);
-        } elseif ($pos === 'mixed') {
-            $rows = array_merge($rows, $g);
-            usort($rows, function ($a, $b) { return (int) $b->rating <=> (int) $a->rating; });
-        } else {
-            $rows = array_merge($rows, $g);
-        }
-        $rows = array_slice($rows, 0, $limit);
-    }
-    return $rows;
+    return $rows ?: [];
 }
 
 /** Počet a priemerné hodnotenie zverejnených recenzií. */

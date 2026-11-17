@@ -395,6 +395,27 @@ Prázdne pole nič nemení.
 Obe nastavenia sú pri každej ponuke zvlášť, prenesú sa pri *Duplikovať*
 a sú súčasťou denných záloh.
 
+## Recenzie z Google – už ručne, bez API
+
+Google Places API je dnes už len platené (treba aktívny billing) a aj tak
+vracalo najviac 5 recenzií. Napojenie je preto **zrušené úplne** – web na
+Google nič nevolá a API kľúč sa z databázy zmazal.
+
+**Ako pridať recenziu z Google:** v Recenziách (wp-admin aj realitný panel)
+pridaj recenziu ako obvykle, text a hodnotenie skopíruj z Google profilu
+a pri **Zdroj recenzie** vyber **Google**. Na webe dostane značku
+„Recenzia z Google" a dá sa radiť, skrývať aj upravovať ako ostatné.
+
+**Nič sa nestratí:** recenzie, ktoré boli naposledy stiahnuté z Google, sa pri
+prvom načítaní po aktualizácii uložili medzi ostatné (so zdrojom Google).
+Vo wp-admine sa raz ukáže hláška, koľko ich bolo.
+
+Voľba „Kam zaradiť recenzie z Google" zmizla – Google recenzie sú teraz bežné
+riadky, takže sa radia rovnako ako všetky (šípkami alebo automaticky).
+
+**Čo aktualizovať:** `zc-reviews.zip` (1.7.0), `property-pro-plugin.zip` (5.63),
+`zdenka-theme.zip` (3.49.0).
+
 ## Hero bez závoja – čitateľnosť drží tieň
 
 Závoj cez fotku je preč, fotka je na PC úplne čistá. Čitateľnosť teraz drží

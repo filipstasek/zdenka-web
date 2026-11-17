@@ -20,6 +20,10 @@ function zcr_ajax_save() {
         'avatar_url'  => esc_url_raw($_POST['avatar_url'] ?? ''),
         'published'   => intval($_POST['published'] ?? 1),
     ];
+    // Zdroj (vlastná / Google) – len ak tabuľka stĺpec už má
+    if (function_exists('zcr_ensure_source_column') && zcr_ensure_source_column()) {
+        $data['source'] = zcr_sanitize_source($_POST['source'] ?? 'own');
+    }
 
     if (!$data['author_name'] || !$data['body']) {
         wp_send_json_error(['message' => 'Meno a text sú povinné.']);

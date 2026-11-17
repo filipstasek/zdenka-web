@@ -28,6 +28,7 @@ function zcr_admin_page() {
             <?php endif; ?>
             <th style="width:40px">#</th>
             <th>Klient</th><th>Rola / Typ</th><th>Text</th>
+            <th style="width:80px">Zdroj</th>
             <th style="width:80px">Hodnotenie</th>
             <th style="width:80px">Status</th>
             <th style="width:120px">Akcie</th>
@@ -42,6 +43,9 @@ function zcr_admin_page() {
             <td style="font-weight:600"><?php echo esc_html($r->author_name) ?></td>
             <td style="color:#666;font-size:13px"><?php echo esc_html($r->author_role ?: '–') ?></td>
             <td style="font-size:13px;color:#444;max-width:280px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"><?php echo esc_html($r->body) ?></td>
+            <td><?php echo (($r->source ?? '') === 'google')
+                ? '<span style="background:#e8f0fe;color:#1a56b8;padding:2px 10px;border-radius:50px;font-size:11px;font-weight:700">Google</span>'
+                : '<span style="color:#6B6560;font-size:12px">Vlastná</span>'; ?></td>
             <td style="color:#B8A47A;letter-spacing:2px"><?php echo str_repeat('★',intval($r->rating)) ?></td>
             <td><?php echo $r->published
                 ? '<span style="background:#dcfce7;color:#15803d;padding:2px 10px;border-radius:50px;font-size:11px;font-weight:700">Aktívna</span>'
@@ -53,7 +57,7 @@ function zcr_admin_page() {
             </td>
         </tr>
         <?php endforeach; else: ?>
-        <tr><td colspan="<?php echo (function_exists('zcr_order_controls') && zcr_display_order() === 'manual') ? 8 : 7; ?>" style="text-align:center;padding:32px;color:#aaa">Zatiaľ žiadne recenzie. Pridajte prvú!</td></tr>
+        <tr><td colspan="<?php echo (function_exists('zcr_order_controls') && zcr_display_order() === 'manual') ? 9 : 8; ?>" style="text-align:center;padding:32px;color:#aaa">Zatiaľ žiadne recenzie. Pridajte prvú!</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -110,6 +114,15 @@ function zcr_modal() {
                     </label>
                 </div>
             </div>
+            <div style="margin-bottom:12px">
+                <label style="display:block;font-size:11px;font-weight:700;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Zdroj recenzie</label>
+                <select id="zcrSource" style="width:100%;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:14px">
+                    <?php foreach ((function_exists('zcr_sources') ? zcr_sources() : ['own' => 'Vlastná']) as $sk => $sl): ?>
+                    <option value="<?php echo esc_attr($sk) ?>"><?php echo esc_html($sl) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span style="font-size:11.5px;color:#6B6560">Pri „Google" sa na webe ukáže značka „Recenzia z Google". Text aj hodnotenie skopíruj z Google profilu.</span>
+            </div>
             <div style="margin-bottom:18px">
                 <label style="display:block;font-size:11px;font-weight:700;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Fotografia klienta (URL, nepovinné)</label>
                 <input type="text" id="zcrAvatar" style="width:100%;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:14px" placeholder="https://...">
@@ -161,6 +174,7 @@ function zcr_admin_scripts() {
             document.getElementById('zcrBody').value    = r.body;
             document.getElementById('zcrAvatar').value  = r.avatar_url;
             document.getElementById('zcrPublished').checked = r.published == 1;
+            document.getElementById('zcrSource').value = r.source || 'own';
             zcrSetRating(parseInt(r.rating)||5);
         } else {
             title.textContent = 'Pridať recenziu';
@@ -169,6 +183,7 @@ function zcr_admin_scripts() {
             document.getElementById('zcrBody').value    = '';
             document.getElementById('zcrAvatar').value  = '';
             document.getElementById('zcrPublished').checked = true;
+            document.getElementById('zcrSource').value = 'own';
             zcrSetRating(5);
         }
         modal.style.display = 'block';
@@ -185,6 +200,7 @@ function zcr_admin_scripts() {
         data.append('rating',      document.getElementById('zcrRating').value);
         data.append('avatar_url',  document.getElementById('zcrAvatar').value);
         data.append('published',   document.getElementById('zcrPublished').checked ? 1 : 0);
+        data.append('source',      document.getElementById('zcrSource').value);
 
         fetch(ZCR_AJAX, {method:'POST',body:data}).then(r=>r.json()).then(res=>{
             var msg = document.getElementById('zcrModalMsg');
