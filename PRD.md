@@ -6,7 +6,7 @@ rozhodnutia" je najdôležitejšia — sú tam veci, ktoré vyzerajú ako chyba,
 chyba to nie je.
 
 Stav k: **zdenka-theme 3.49.3 · property-pro-plugin 5.71 · zc-newsletter (ZC VIP) 1.24.3
-· zc-reviews 1.7.0 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.4**
+· zc-reviews 1.7.1 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.5**
 
 > **Zdroj pravdy je ostrý web.** Na webe sa medzičasom robilo aj mimo tohto
 > repozitára (premenovanie na VIP, katalógy typov a stavov ponúk). Pred každou

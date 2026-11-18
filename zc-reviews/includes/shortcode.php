@@ -411,7 +411,7 @@ function zcr_grid_carousel($rows, $cols = 3, $row_count = 2, $clamp = true) {
         }
         function start(){
             stop();
-            if(pages.length>1&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+            if(pages.length>1&&window.matchMedia('(hover:hover) and (pointer:fine)').matches){
                 timer=window.setInterval(function(){go(index+1,false)},7000);
             }
         }
@@ -475,14 +475,20 @@ function zcr_grid_carousel($rows, $cols = 3, $row_count = 2, $clamp = true) {
         shell.addEventListener('focusin',stop);
         shell.addEventListener('focusout',start);
 
-        var touchX=0;
-        track.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX},{passive:true});
+        // Zvislé posúvanie stránky nesmie prepnúť stranu
+        var touchX=0,touchY=0;
+        track.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;stop()},{passive:true});
         track.addEventListener('touchend',function(e){
             var distance=touchX-e.changedTouches[0].clientX;
-            if(Math.abs(distance)>45)go(index+(distance>0?1:-1),true);
+            var dy=Math.abs(touchY-e.changedTouches[0].clientY);
+            if(Math.abs(distance)>45&&Math.abs(distance)>dy*1.2)go(index+(distance>0?1:-1),true);
         },{passive:true});
 
+        // Mobil hlási „resize" aj pri skrytí panela s adresou – len zmena šírky
+        var lastW=window.innerWidth;
         window.addEventListener('resize',function(){
+            if(window.innerWidth===lastW)return;
+            lastW=window.innerWidth;
             window.clearTimeout(resizeTimer);
             resizeTimer=window.setTimeout(build,140);
         });
@@ -501,7 +507,8 @@ function zcr_carousel($rows) {
     /* Zvislé odsadenie je nutné: karta sa pri prejdení myšou nadvihne o 3 px
        a bez neho jej overflow:hidden odrezal horný rámik aj tieň. */
     .zcrc-wrap{position:relative;overflow:hidden;padding:12px 0}
-    .zcrc-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);align-items:stretch}
+    .zcrc-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);align-items:stretch;
+        touch-action:pan-y;will-change:transform}
     .zcrc-slide{flex:0 0 calc(100%/3);padding:0 11px;box-sizing:border-box}
     .zcrc-btn{position:absolute;top:50%;transform:translateY(-50%);
         width:44px;height:44px;border-radius:50%;background:var(--white,#fff);
@@ -540,64 +547,114 @@ function zcr_carousel($rows) {
     <div class="zcrc-dots" id="<?php echo $uid ?>d"></div>
     <script>
     (function(){
-        var idx=0,total=<?php echo $total ?>;
-        var tr=document.getElementById('<?php echo $uid ?>t');
-        var dots=document.getElementById('<?php echo $uid ?>d');
-        var shell=tr.closest('.zcrc-shell');
-        var ds=[];
-        // Responsive per-page
+        var uid='<?php echo $uid ?>', idx=0, total=<?php echo $total ?>;
+        var tr=document.getElementById(uid+'t'), wrap=tr.parentElement;
+        var dots=document.getElementById(uid+'d'), shell=tr.closest('.zcrc-shell');
+        var ds=[], lastW=window.innerWidth, timer=null, stopped=false, visible=false;
+        // Samé posúvanie len tam, kde sa dá zastaviť myšou. Na dotykových
+        // zariadeniach by karta odbehla uprostred čítania.
+        var canAuto=window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
         function getPer(){return window.innerWidth<=768?1:window.innerWidth<=900?2:3}
+        function pages(){return Math.max(1,Math.ceil(total/getPer()))}
         function rebuildDots(){
-            var pages=Math.ceil(total/getPer());
+            var n=pages();
             dots.innerHTML='';
-            for(var i=0;i<pages;i++){
+            for(var i=0;i<n;i++){
                 var b=document.createElement('button');
                 b.type='button';
                 b.className='zcrc-dot'+(i===idx?' on':'');
-                b.type='button';
-                b.setAttribute('aria-label','Recenzia '+(i+1));
                 b.setAttribute('aria-label','Zobraziť skupinu recenzií '+(i+1));
-                (function(page){b.addEventListener('click',function(){go(page)})})(i);
+                (function(page){b.addEventListener('click',function(){halt();go(page)})})(i);
                 dots.appendChild(b);
             }
             ds=dots.querySelectorAll('.zcrc-dot');
-            dots.style.display=pages>1?'flex':'none';
+            dots.style.display=n>1?'flex':'none';
             if(shell){
                 shell.querySelectorAll('.zcrc-btn').forEach(function(btn){
-                    btn.style.display=(pages>1&&window.innerWidth>768)?'flex':'none';
+                    btn.style.display=(n>1&&window.innerWidth>768)?'flex':'none';
                 });
             }
         }
+        // Posun v percentách šírky – nezávisí od nameranej šírky v pixeloch.
+        // Posledná strana sa zarovná k poslednej karte, aby nezostalo prázdne miesto.
+        function offset(i){var p=getPer();return Math.min(i*p,Math.max(0,total-p))*100/p}
         function go(i){
-            var p=getPer(),max=Math.ceil(total/p)-1;
+            var max=pages()-1;
             idx=Math.max(0,Math.min(i,max));
-            var w=tr.parentElement.offsetWidth;
-            tr.style.transform='translateX(-'+(idx*w)+'px)';
+            tr.style.transform='translateX(-'+offset(idx)+'%)';
             ds.forEach(function(d,j){d.classList.toggle('on',j===idx)});
         }
-        window['<?php echo $uid ?>N']=function(){go(idx+1<Math.ceil(total/getPer())?idx+1:0)};
-        window['<?php echo $uid ?>P']=function(){go(idx>0?idx-1:Math.ceil(total/getPer())-1)};
-        window['<?php echo $uid ?>G']=function(i){go(i)};
-        // Touch swipe
-        var sx=0;
-        tr.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
-        tr.addEventListener('touchend',function(e){
-            var d=sx-e.changedTouches[0].clientX;
-            if(Math.abs(d)>50){d>0?window['<?php echo $uid ?>N']():window['<?php echo $uid ?>P']()}
-        });
-        // Auto-play
-        var timer=setInterval(function(){window['<?php echo $uid ?>N']()},6000);
-        tr.parentElement.addEventListener('mouseenter',function(){clearInterval(timer)});
-        tr.parentElement.addEventListener('mouseleave',function(){
-            timer=setInterval(function(){window['<?php echo $uid ?>N']()},6000)
-        });
-        var resizeTimer;
+        function next(){go(idx+1<pages()?idx+1:0)}
+        function prev(){go(idx>0?idx-1:pages()-1)}
+        window[uid+'N']=function(){halt();next()};
+        window[uid+'P']=function(){halt();prev()};
+        window[uid+'G']=function(i){halt();go(i)};
+
+        function play(){
+            if(!canAuto||stopped||!visible||document.hidden||timer)return;
+            timer=setInterval(next,6000);
+        }
+        function pause(){clearInterval(timer);timer=null}
+        // Po akomkoľvek zásahu návštevníka už samé posúvanie nepokračuje
+        function halt(){stopped=true;pause()}
+
+        // Potiahnutie prstom: karta ide za prstom, zvislé posúvanie stránky
+        // sa nikdy nezamení za potiahnutie do strany.
+        var sx=0,sy=0,dx=0,mode='';
+        tr.addEventListener('touchstart',function(e){
+            sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;mode='';
+        },{passive:true});
+        tr.addEventListener('touchmove',function(e){
+            var x=e.touches[0].clientX-sx,y=e.touches[0].clientY-sy;
+            if(!mode){
+                if(Math.abs(x)<8&&Math.abs(y)<8)return;
+                mode=Math.abs(x)>Math.abs(y)*1.2?'h':'v';
+                if(mode==='h'){halt();tr.style.transition='none'}
+            }
+            if(mode!=='h')return;
+            dx=x;
+            var atEdge=(idx===0&&dx>0)||(idx===pages()-1&&dx<0);
+            tr.style.transform='translateX(calc(-'+offset(idx)+'% + '+(atEdge?dx/3:dx)+'px))';
+        },{passive:true});
+        function endTouch(){
+            if(mode!=='h'){mode='';return}
+            mode='';
+            tr.style.transition='';
+            var lim=Math.min(60,wrap.offsetWidth*.18);
+            if(dx<-lim&&idx<pages()-1)go(idx+1);
+            else if(dx>lim&&idx>0)go(idx-1);
+            else go(idx);
+        }
+        tr.addEventListener('touchend',endTouch);
+        tr.addEventListener('touchcancel',endTouch);
+
+        if(shell){
+            shell.addEventListener('mouseenter',pause);
+            shell.addEventListener('mouseleave',play);
+            shell.addEventListener('focusin',pause);
+            // Rozbalenie dlhej recenzie = číta sa, nikam neposúvať
+            shell.addEventListener('click',function(e){if(e.target.closest('.zcr-more'))halt()});
+        }
+        document.addEventListener('visibilitychange',function(){document.hidden?pause():play()});
+        if('IntersectionObserver' in window){
+            new IntersectionObserver(function(en){
+                visible=en[0].isIntersecting;visible?play():pause();
+            },{threshold:.4}).observe(wrap);
+        } else { visible=true; }
+
+        // Mobil pri skrývaní panela s adresou hlási „resize" so zmenenou
+        // výškou – reagujeme len na zmenu šírky.
+        var rt;
         window.addEventListener('resize',function(){
-            clearTimeout(resizeTimer);
-            resizeTimer=setTimeout(function(){rebuildDots();go(idx)},120);
+            if(window.innerWidth===lastW)return;
+            lastW=window.innerWidth;
+            clearTimeout(rt);
+            rt=setTimeout(function(){rebuildDots();go(idx)},120);
         });
         rebuildDots();
         go(0);
+        play();
     })();
     </script>
     <?php return ob_get_clean();
