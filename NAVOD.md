@@ -413,8 +413,9 @@ Vo wp-admine sa raz ukáže hláška, koľko ich bolo.
 Voľba „Kam zaradiť recenzie z Google" zmizla – Google recenzie sú teraz bežné
 riadky, takže sa radia rovnako ako všetky (šípkami alebo automaticky).
 
-**Čo aktualizovať:** `zc-reviews.zip` (1.7.0), `property-pro-plugin.zip` (5.63),
-`zdenka-theme.zip` (3.49.0).
+**Čo aktualizovať:** `zc-reviews.zip` (1.7.0), `property-pro-plugin.zip` (5.71),
+`zdenka-theme.zip` (3.49.3). Téma a property-pro sú postavené na verziách,
+ktoré boli na webe (3.49.2 a 5.70) – nič z nich sa nestratilo.
 
 ## Hero bez závoja – čitateľnosť drží tieň
 

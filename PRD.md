@@ -5,8 +5,13 @@ robí, ako je postavený a prečo je postavený práve tak**. Časť „Vedomé
 rozhodnutia" je najdôležitejšia — sú tam veci, ktoré vyzerajú ako chyba, ale
 chyba to nie je.
 
-Stav k: **zdenka-theme 3.49.0 · property-pro-plugin 5.63 · zc-newsletter 1.23.0
-· zc-reviews 1.7.0 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.3**
+Stav k: **zdenka-theme 3.49.3 · property-pro-plugin 5.71 · zc-newsletter (ZC VIP) 1.24.3
+· zc-reviews 1.7.0 · zc-ebook 1.0.7 · zc-2fa 1.1.3 · zc-installer 1.0.4**
+
+> **Zdroj pravdy je ostrý web.** Na webe sa medzičasom robilo aj mimo tohto
+> repozitára (premenovanie na VIP, katalógy typov a stavov ponúk). Pred každou
+> prácou si nechaj od klienta poslať aktuálne pluginy z webu a porovnaj ich
+> s repozitárom (`diff -rq --strip-trailing-cr` – súbory z webu majú CRLF).
 
 ---
 
@@ -35,7 +40,7 @@ majú zmenšené kópie (viď §9).
 |---|---|---|
 | `zdenka-theme` | 5 835 | vzhľad, šablóny stránok, editovateľné texty, nástroje pre webmastera |
 | `property-pro-plugin` | 8 489 | nehnuteľnosti, realitný panel, CRM, zálohy, denník |
-| `zc-newsletter` | 3 405 | odberatelia, kategórie, rozposielanie, šablóny e-mailov |
+| `zc-newsletter` | 3 405 | **„ZC VIP"** – odber ponúk: odberatelia, kategórie, rozposielanie, šablóny e-mailov |
 | `zc-reviews` | 1 387 | recenzie; tie z Google sa pridávajú ručne (bez API) |
 | `zc-ebook` | 603 | PDF lead-magnet |
 | `zc-2fa` | 1 107 | dvojfaktorové prihlásenie |
@@ -78,7 +83,7 @@ verzii, len zobrazí výzvu na aktualizáciu. **Toto pravidlo dodržiavať.**
 ```
 [property_grid]  [property_carousel]  [property_filter]  [property_favorites]
 [predane_nehnutelnosti]  [porovnanie]  [reality_mesto]  [realitny_panel]
-[zc_reviews]  [zc_newsletter]  [zc_newsletter_full]  [zc_ebook]
+[zc_reviews]  [zc_vip]  [zc_newsletter]  [zc_newsletter_full]  [zc_ebook]
 [zc_contact_form]
 ```
 
@@ -100,7 +105,7 @@ nastavenia po celom WordPresse. Vyžaduje `manage_options`.
 | Texty stránok | 43+ textov zo šablón, ktoré nejdú cez editor |
 | Stránky a údržba | režim údržby, zapínanie stránok |
 | Notifikácie | komu chodia dopyty z formulárov |
-| Newsletter | odberatelia, kategórie, rozosielanie, história |
+| VIP (bývalý Newsletter) | odberatelia, kategórie, rozosielanie, história |
 | Recenzie | správa recenzií vrátane tých z Google (zdroj „Google") |
 | Ebook | lead-magnet |
 | Indexovanie | diagnostika presmerovaní pre Search Console |
@@ -116,7 +121,14 @@ wp-admin, ale je pohodlnejší — pri rozporoch je **panel referenčný vzor**.
 
 ---
 
-## 6. Newsletter — model, ktorý treba pochopiť celý
+## 6. VIP (newsletter) — model, ktorý treba pochopiť celý
+
+Navonok sa volá **VIP** (stránka `/vip/`, shortcode `[zc_vip]`, plugin „ZC VIP").
+Vnútri ostali názvy `zcn_*`, tabuľka `zc_newsletter` aj priečinok `zc-newsletter` –
+**nepremenovávať**, prišlo by sa o dáta a o nadväznosť aktualizácií.
+
+Kontaktný formulár s odškrtnutým VIP prihlasuje **vždy na všetky ponuky**;
+záujem uvedený vo formulári patrí do CRM, nie do preferencií odberu.
 
 ### Kategórie
 Definované v `zcn_categories()`, uložené v option `zcn_categories`, editovateľné
@@ -166,12 +178,23 @@ Cieliť sa dá na: všetkých / len ponuky / vybrané kategórie / **konkrétnyc
 
 ## 7. Číselníky pri zadávaní ponuky
 
-`property-pro-plugin/includes/options.php`, stránka *Možnosti ponúk*.
-Spravovateľné sú **Stav** a **Vlastníctvo**: pridať, premenovať, skryť, zmazať,
-vrátiť pôvodné. Pri každej položke sa ukazuje, koľko ponúk ju používa.
+`property-pro-plugin/includes/options.php`, stránka *Možnosti ponúk* vo wp-admine
+aj sekcia v realitnom paneli (`panel_property_options`). Spravujú sa štyri zoznamy:
 
-Do meta sa ukladá **názov, nie kľúč** (historicky, viaže sa na to filtrovanie
-aj šablóny). Z toho plynú tri veci, ktoré sú už vyriešené:
+| Zoznam | Meta | Ukladá sa | Poznámka |
+|---|---|---|---|
+| Typ ponuky | `_property_typ` | **kľúč** (`predaj`…) | názov + farba štítka, príznak „prenájom" |
+| Stav ponuky | `_property_stav_predaja` | **kľúč** (`rezervovane`…) | farba, vlastný názov pri prenájme („Prenajaté") |
+| Stav nehnuteľnosti | `_property_stav` | **názov** | novostavba, rekonštrukcia… |
+| Vlastníctvo | `_property_vlastnictvo` | **názov** | |
+
+**Typ a stav ponuky** (`pp_catalog_*`, uložené v `pp_catalog_types|statuses`)
+majú stabilný kľúč a meniteľný názov – premenovanie nič nerozbije. **Kľúče
+`predaj`, `prenajom`, `pozemok`, `rezervovane`, `predane` nemeniť ani nemazať**,
+viaže sa na ne filtrovanie a štýly. Farby štítkov idú cez `pp_badge_presets()`.
+
+Pri **Stave nehnuteľnosti a Vlastníctve** sa do meta ukladá **názov, nie kľúč**
+(historicky). Z toho plynú tri veci, ktoré sú už vyriešené:
 
 1. Premenovanie položky prepíše aj uložené ponuky (`pp_option_rename`).
 2. Skrytá položka sa novým ponukám neponúka, ale ponuka, ktorá ju už má, si ju
@@ -179,8 +202,9 @@ aj šablóny). Z toho plynú tri veci, ktoré sú už vyriešené:
 3. Hodnoty, ktoré v zozname už nie sú, sa vypíšu s počtom ponúk a dajú sa
    hromadne nahradiť.
 
-**Neurobiť spravovateľným:** „Typ ponuky" (`predaj|prenajom|pozemok`) a stav
-predaja (`rezervovane|predane`) — na ich kľúčoch stojí filtrovanie a štítky.
+> Pôvodne tu stálo, že typ a stav ponuky sa nemajú robiť spravovateľnými.
+> Na webe sa to vyriešilo správne – kľúč ostáva, mení sa len názov – takže
+> to obmedzenie už neplatí.
 
 ---
 
@@ -238,7 +262,9 @@ robila tmavý nápis na zlatom tlačidle špinavým.
 4. Zvýšiť verziu v `style.css` **aj** v `functions.php` (je tam v `wp_enqueue_*`
    ako cache-buster), resp. v hlavičke pluginu aj v jeho `define(...)`.
 5. Zabaliť: `zip -qr dist/<balík>.zip <balík>`.
-6. **Obnoviť `zc-installer/bundles/`** — inštalátor v sebe nesie kópie
+6. **Konce riadkov:** v repozitári LF. Súbory z webu prichádzajú s CRLF –
+   pri preberaní ich previesť, inak `git diff` ukáže zmenu v každom riadku.
+7. **Obnoviť `zc-installer/bundles/`** — inštalátor v sebe nesie kópie
    ostatných zipov a `glob`-uje ich. Keď sa neobnovia, inštalátor vráti web
    o verzie späť. (Toto bol reálny nedorobok, opravený.)
 

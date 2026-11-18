@@ -2862,6 +2862,10 @@ function zcr_panel_handle_post() {
             'avatar_url'  => esc_url_raw($_POST['avatar_url'] ?? ''),
             'published'   => empty($_POST['published']) ? 0 : 1,
         ];
+        // Zdroj recenzie (vlastná / Google) – starší plugin recenzií ho nepozná
+        if (function_exists('zcr_ensure_source_column') && zcr_ensure_source_column()) {
+            $data['source'] = zcr_sanitize_source($_POST['source'] ?? 'own');
+        }
         if ($id) {
             zcr_audit_snapshot($id);
             $r = $wpdb->update($t, $data, ['id' => $id]);
@@ -3018,6 +3022,7 @@ function panel_reviews() {
         $f_body   = $cur ? $cur->body        : '';
         $f_rating = $cur ? (int) $cur->rating : 5;
         $f_pub    = $cur ? (int) $cur->published : 1;
+        $f_src    = ($cur && !empty($cur->source)) ? $cur->source : 'own';
     ?>
     <form method="post" action="<?php echo esc_url($endpoint) ?>" class="rev-form-card">
         <?php zcr_panel_form_fields($cur ? (int) $cur->id : 0); ?>
@@ -3052,6 +3057,18 @@ function panel_reviews() {
                 </div>
             </div>
 
+            <?php if (function_exists('zcr_sources')): ?>
+            <label class="rev-f">
+                <span class="rev-f-lbl">Zdroj recenzie</span>
+                <select name="source">
+                    <?php foreach (zcr_sources() as $sk => $sl): ?>
+                    <option value="<?php echo esc_attr($sk) ?>" <?php selected($f_src, $sk) ?>><?php echo esc_html($sl) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <small style="color:var(--muted);font-size:11.5px">Pri „Google" sa na webe ukáže značka „Recenzia z Google". Text skopíruj z Google profilu.</small>
+            </label>
+            <?php endif; ?>
+
             <label class="rev-check">
                 <input type="checkbox" name="published" value="1" <?php checked($f_pub, 1) ?>>
                 <span>Zobraziť na webe</span>
@@ -3081,6 +3098,7 @@ function panel_reviews() {
                     <?php if ($r->author_role): ?><span class="rev-role"><?php echo esc_html($r->author_role) ?></span><?php endif; ?>
                     <span class="rev-stars"><?php echo str_repeat('★', (int) $r->rating) . str_repeat('☆', 5 - (int) $r->rating) ?></span>
                     <span class="rev-badge <?php echo $r->published ? 'on' : 'off' ?>"><?php echo $r->published ? 'Na webe' : 'Skrytá' ?></span>
+                    <?php if (($r->source ?? '') === 'google'): ?><span class="rev-badge" style="background:#e8f0fe;color:#1a56b8">Google</span><?php endif; ?>
                 </div>
                 <div class="rev-row-body"><?php echo esc_html($r->body) ?></div>
             </div>

@@ -314,7 +314,6 @@ function zc_hub_page() {
             <?php
             zc_hub_card('Google Site Kit', 'Analytics, Search Console a PageSpeed na jednom mieste.', admin_url('admin.php?page=googlesitekit-dashboard'), 'G', $sitekit, '', $sitekit ? 'Plugin je aktívny' : '');
             zc_hub_card('Indexovanie', 'Prečo web nie je v Google – presmerovania, sitemap.', admin_url('admin.php?page=zc-indexovanie'), '🔎', true);
-            zc_hub_card('Recenzie z Google', 'Napojenie Places API a synchronizácia hodnotení.', admin_url('admin.php?page=zc-reviews-google'), '★', zc_hub_has('zc-reviews-google'));
             zc_hub_card('Nastavenie merania', 'GTM, adresa, súradnice a miestne SEO.', admin_url('customize.php?autofocus[section]=zc_localseo'), '⌖', true, '', $gtm ? 'GTM je nastavený' : 'Skontrolovať GTM');
             ?>
         </div>
