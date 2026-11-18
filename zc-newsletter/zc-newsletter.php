@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: ZC Newsletter
- * Description: Vlastný newsletter pre zdenkacibulova.sk – databáza v WP, okamžité prihlásenie, správa tém, odhlásenie cez medzikrok.
- * Version: 1.23.0
+ * Plugin Name: ZC VIP
+ * Description: VIP odber ponúk pre zdenkacibulova.sk – výber typov nehnuteľností, databáza kontaktov a rozposielanie.
+ * Version: 1.24.3
  * Author: Filip
  */
 defined('ABSPATH') || exit;
 
-define('ZCN_VERSION', '1.23.0');
+define('ZCN_VERSION', '1.24.3');
 define('ZCN_TABLE',   'zc_newsletter');
 define('ZCN_URL',     plugin_dir_url(__FILE__));
 define('ZCN_PATH',    plugin_dir_path(__FILE__));

@@ -11,7 +11,7 @@ add_action('wp_enqueue_scripts', function() {
     $use_min = get_option('zc_min_css', '1') === '1'
             && file_exists($dir . '/assets/css/main.min.css');
     $css = $use_min ? '/assets/css/main.min.css' : '/assets/css/main.css';
-    wp_enqueue_style('zdenka-main', $uri . $css, [], '3.49.0');
+    wp_enqueue_style('zdenka-main', $uri . $css, [], '3.49.2');
     // Malé kritické úpravy musia platiť aj pri zapnutej staršej minifikovanej verzii.
     wp_add_inline_style('zdenka-main',
         '.zc-nav a{font-size:11px}.zc-prop-badge.is-sold{background:#DC2626!important;color:#fff!important;box-shadow:0 0 9px rgba(220,38,38,.85),0 0 20px rgba(220,38,38,.5)}'
@@ -21,7 +21,7 @@ add_action('wp_enqueue_scripts', function() {
     $use_min_js = get_option('zc_min_css', '1') === '1'
                && file_exists($dir . '/assets/js/main.min.js');
     $js = $use_min_js ? '/assets/js/main.min.js' : '/assets/js/main.js';
-    wp_enqueue_script('zdenka-js', $uri . $js, [], '3.49.0', true);
+    wp_enqueue_script('zdenka-js', $uri . $js, [], '3.49.2', true);
     wp_localize_script('zdenka-js','zcData',['ajaxurl'=>admin_url('admin-ajax.php'),'nonce'=>wp_create_nonce('zc_nonce'),'logoUrl'=>get_stylesheet_directory_uri().'/assets/images/zc-logo.png','ebookOn'=>(function_exists('zc_ebook_enabled') && zc_ebook_enabled())?1:0,'interests'=>function_exists('zcn_interest_choices')?zcn_interest_choices():[],'nlNonce'=>wp_create_nonce('zcn_nonce')]);
 });
 
@@ -150,8 +150,8 @@ function zc_handle_contact() {
     $email = sanitize_email($_POST['email']??'');
     $phone = sanitize_text_field($_POST['phone']??'');
     $msg   = sanitize_textarea_field($_POST['message']??'');
-    // Na typ nehnuteľnosti sa už vo formulári nepýtame – opýtame sa až
-    // po odoslaní, a len toho, kto si zaškrtol newsletter.
+    // Záujem z kontaktného formulára patrí do CRM, nie do VIP preferencií.
+    // VIP opt-in z bežného formulára sa vždy zapína pre všetky ponuky.
     $interest = '';
     if (!$name||!$email) { wp_send_json_error(['message'=>'Vyplňte meno a email.']); }
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
@@ -185,23 +185,19 @@ function zc_handle_contact() {
     $newsletter_added = null;
     if ($newsletter_requested && $email) {
         $newsletter_added = function_exists('zcn_subscribe_forced')
-            ? zcn_subscribe_forced($email, $name, 'kontakt', $interest)
+            ? zcn_subscribe_forced($email, $name, 'kontakt', '')
             : false;
     }
 
     $response_message = 'Správa odoslaná! Ozvem sa vám čoskoro.';
-    $interest_token = '';
     if ($newsletter_requested && $newsletter_added) {
-        $response_message .= ' E-mail bol pridaný aj do newslettera.';
-        // Token pre okno „O aké ponuky máte záujem?" – platí 30 minút
-        if (function_exists('zcn_interest_token')) $interest_token = zcn_interest_token($email);
+        $response_message .= ' VIP odber všetkých ponúk je aktívny. Poslali sme vám e-mail, v ktorom si môžete kategórie kedykoľvek upraviť.';
     } elseif ($newsletter_requested && !$newsletter_added) {
-        $response_message .= ' Prihlásenie do newslettera sa nepodarilo; skúste samostatný formulár Newsletter.';
+        $response_message .= ' Prihlásenie do VIP sa nepodarilo; skúste samostatný formulár na stránke VIP.';
     }
     wp_send_json_success([
         'message'         => $response_message,
         'newsletter_added'=> (bool) $newsletter_added,
-        'interest_token'  => $interest_token,
     ]);
 }
 

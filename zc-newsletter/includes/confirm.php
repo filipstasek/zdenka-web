@@ -15,30 +15,45 @@ add_action('init', function() {
     }
 
     if ($action === 'confirm') {
-        // Uloženie výberu tém priamo z tejto stránky
+        $already = ($row->status === 'active');
+
+        // Samotné otvorenie odkazu ešte nič nepotvrdzuje. Kontakt sa aktivuje
+        // až po vedomom výbere aspoň jednej ponuky a odoslaní formulára.
         if (isset($_POST['zcn_pick']) && wp_verify_nonce($_POST['_zcnpick'] ?? '', 'zcn_pick_' . $token)) {
-            $wpdb->update($table,
-                ['interest' => zcn_sanitize_interests($_POST['interest'] ?? [])],
-                ['token' => $token]
-            );
+            $selected = array_values(array_intersect(
+                zcn_interest_list($_POST['interest'] ?? []),
+                array_keys(zcn_offer_interests())
+            ));
+            if (!$selected) {
+                wp_die(
+                    zcn_interest_picker_page($token, $row, $already, 'confirm', 'Vyberte aspoň jeden typ ponuky.'),
+                    'Vyberte ponuky'
+                );
+            }
+
+            $data = ['interest' => zcn_sanitize_interests($selected)];
+            if (!$already) {
+                $data['status'] = 'active';
+                $data['confirmed_at'] = current_time('mysql');
+            }
+            $updated = $wpdb->update($table, $data, ['token' => $token]);
+            if ($updated === false) {
+                wp_die(
+                    zcn_interest_picker_page($token, $row, $already, 'confirm', 'Výber sa nepodarilo uložiť. Skúste to znova.'),
+                    'Chyba'
+                );
+            }
+            if (!$already && function_exists('zcn_send_welcome')) {
+                zcn_send_welcome($row->email, $row->name);
+            }
             wp_die(zcn_page_response(
-                'Máme to, ďakujeme!',
-                'Budeme vám posielať presne to, čo ste si vybrali. Kedykoľvek to viete zmeniť – stačí nám napísať.',
+                $already ? 'Výber uložený' : 'Vitajte vo VIP!',
+                'Budeme vám posielať iba vybrané typy ponúk. Výber môžete kedykoľvek zmeniť odkazom v e-maile.',
                 '← Späť na web'
             ), 'Hotovo');
         }
 
-        $already = ($row->status === 'active');
-        if (!$already) {
-            $wpdb->update($table,
-                ['status' => 'active', 'confirmed_at' => current_time('mysql')],
-                ['token'  => $token]
-            );
-            if (function_exists('zcn_send_welcome')) zcn_send_welcome($row->email, $row->name);
-        }
-
-        // Po potvrdení si človek vyberie, čo ho zaujíma – môže označiť aj viac
-        wp_die(zcn_interest_picker_page($token, $row, $already), 'Potvrdené');
+        wp_die(zcn_interest_picker_page($token, $row, $already), 'Vyberte ponuky');
     }
 
     if ($action === 'prefs') {
@@ -76,7 +91,11 @@ add_action('init', function() {
             ), 'Hotovo');
         }
 
-        // Vedomé potvrdenie odchodu z medzistránky
+        // Prvé, menej výrazné tlačidlo iba otvorí finálny medzikrok.
+        $review = isset($_POST['zcn_unsub_review'])
+            && wp_verify_nonce($_POST['_zcnunsub'] ?? '', 'zcn_unsub_' . $token);
+
+        // Až druhé vedomé potvrdenie kontakt skutočne odhlási.
         $confirmed = isset($_POST['zcn_unsub_confirm'])
             && wp_verify_nonce($_POST['_zcnunsub'] ?? '', 'zcn_unsub_' . $token);
 
@@ -88,7 +107,11 @@ add_action('init', function() {
             ), 'Odhlásenie');
         }
 
-        // Kliknutie na odkaz v e-maile najprv ponúkne úpravu tém
+        if (!$one_click && $review) {
+            wp_die(zcn_unsubscribe_confirm_page($token), 'Potvrdenie odhlásenia');
+        }
+
+        // Kliknutie na odkaz v e-maile najprv ponúkne úpravu tém.
         if (!$one_click && !$confirmed) {
             wp_die(zcn_interest_picker_page($token, $row, true, 'unsub'), 'Odhlásenie');
         }
@@ -102,7 +125,7 @@ add_action('init', function() {
 
         wp_die(zcn_page_response(
             'Odhlásenie úspešné',
-            'Boli ste odhlásený z odberu noviniek. Nebudeme vás viac kontaktovať.',
+            'Boli ste odhlásený z VIP odberu. Ďalšie VIP e-maily vám už nebudeme posielať.',
             '← Späť na web'
         ), 'Odhlásenie');
     }
@@ -129,13 +152,47 @@ function zcn_page_response($title, $text, $btn_label) {
     </div></body></html>';
 }
 
+/** Finálny medzikrok pred úplným odhlásením z VIP. */
+function zcn_unsubscribe_confirm_page($token) {
+    ob_start(); ?>
+    <form method="post" class="final-unsub"
+          action="<?php echo esc_url(add_query_arg(['zcn_action' => 'unsubscribe', 'token' => $token], home_url('/'))); ?>">
+        <?php wp_nonce_field('zcn_unsub_' . $token, '_zcnunsub'); ?>
+        <input type="hidden" name="zcn_unsub_confirm" value="1">
+        <button type="submit">Áno, úplne ma odhlásiť z VIP</button>
+    </form>
+    <?php
+    $form = ob_get_clean();
+    $html = zcn_page_response(
+        'Naozaj sa chcete odhlásiť?',
+        'Ak vám chodí priveľa e-mailov, môžete sa vrátiť a ponechať si iba vybrané typy ponúk. Úplným odhlásením prestanete dostávať všetky VIP e-maily.',
+        'Nie, zostať vo VIP'
+    );
+    $css = '<style>
+    .final-unsub{margin-top:8px}
+    .final-unsub button{display:block;width:100%;padding:8px 6px 16px;border:0;background:none;
+        color:#8A8078;font:600 12.5px/1.4 "DM Sans",sans-serif;text-decoration:underline;
+        text-underline-offset:3px;cursor:pointer}
+    .final-unsub button:hover{color:#b91c1c;background:none}
+    </style>';
+    $html = str_replace('</head>', $css . '</head>', $html);
+    $home_link = '<a href="' . home_url() . '">Nie, zostať vo VIP</a>';
+    $back_link = '<a href="' . esc_url(zcn_unsubscribe_url($token)) . '">Nie, zostať vo VIP</a>';
+    return str_replace($home_link, $back_link . $form, $html);
+}
+
 /**
  * Stránka po potvrdení odberu – výber tém.
  * Zaškrtnúť sa dá viac možností; nič nezaškrtnuté = posielame všetko.
  */
-function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confirm') {
+function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confirm', $error = '') {
     $current = zcn_interest_list($row->interest ?? '');
-    $groups  = zcn_interest_groups();
+    // Pri prvom potvrdení ide VIP výhradne o typy ponúk. V neskorších
+    // preferenciách ponechávame aj staršie vlastné kategórie správcu.
+    $offers = zcn_offer_interests();
+    $groups = ($mode === 'confirm' && $offers)
+        ? ['Ponuky' => $offers]
+        : zcn_interest_groups();
 
     ob_start(); ?>
     <form method="post" style="text-align:left">
@@ -150,9 +207,14 @@ function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confi
             <span><?php echo esc_html($label); ?></span>
         </label>
         <?php endforeach; endforeach; ?>
-        <p class="hint">Nič nezaškrtnuté = pošleme vám všetko. Vybrať sa dá aj viac možností naraz.</p>
+        <?php if ($error): ?><div class="pick-error" role="alert"><?php echo esc_html($error); ?></div><?php endif; ?>
+        <p class="hint"><?php echo $mode === 'confirm'
+            ? 'Vyberte aspoň jednu možnosť. VIP sa aktivuje až po odoslaní tohto výberu.'
+            : 'Nič nezaškrtnuté = pošleme vám všetko. Vybrať sa dá aj viac možností naraz.'; ?></p>
         <button type="submit" class="btn"><?php
-            echo $mode === 'unsub' ? 'Uložiť výber a zostať' : 'Uložiť výber';
+            echo $mode === 'unsub'
+                ? 'Uložiť výber a zostať'
+                : ($mode === 'confirm' && !$already ? 'Potvrdiť vstup do VIP' : 'Uložiť výber');
         ?></button>
     </form>
     <?php if ($mode === 'prefs' || $mode === 'unsub'): ?>
@@ -161,12 +223,8 @@ function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confi
     <form method="post" class="unsub-form"
           action="<?php echo esc_url(add_query_arg(['zcn_action' => 'unsubscribe', 'token' => $token], home_url('/'))); ?>">
         <?php wp_nonce_field('zcn_unsub_' . $token, '_zcnunsub'); ?>
-        <input type="hidden" name="zcn_unsub_confirm" value="1">
-        <button type="submit" class="unsub"><?php
-            echo $mode === 'unsub'
-                ? 'Nie, ďakujem – odhláste ma úplne'
-                : 'Nechcem už dostávať nič – odhlásiť sa';
-        ?></button>
+        <input type="hidden" name="zcn_unsub_review" value="1">
+        <button type="submit" class="unsub">Odhlásiť sa úplne z VIP</button>
     </form>
     <?php endif; ?>
     <?php
@@ -180,8 +238,10 @@ function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confi
         $title = 'Moje témy';
         $text  = 'Označte, čo vám máme posielať. Zmeny sa uložia okamžite.';
     } else {
-        $title = $already ? 'Odber už máte potvrdený' : 'Prihlásenie potvrdené!';
-        $text  = 'Vyberte si, čo vás zaujíma – budeme vám posielať len to.';
+        $title = $already ? 'Upravte svoj VIP výber' : 'Dokončite vstup do VIP';
+        $text  = $already
+            ? 'Vyberte si typy ponúk, ktoré vás zaujímajú.'
+            : 'Označte aspoň jeden typ ponuky. Až potom sa VIP aktivuje.';
     }
 
     $html = zcn_page_response($title, $text, '← Späť na web');
@@ -195,6 +255,8 @@ function zcn_interest_picker_page($token, $row, $already = false, $mode = 'confi
     .opt:hover{border-color:#B8A47A;background:#FBF8F2}
     .opt input{width:18px;height:18px;accent-color:#B8A47A;flex:0 0 auto}
     .hint{font-size:12.5px;color:#7C5E33;line-height:1.6;margin:14px 0 18px;text-align:left}
+    .pick-error{padding:11px 13px;margin:14px 0 0;border:1px solid #fecaca;border-radius:8px;
+         background:#fef2f2;color:#b91c1c;font-size:13px;font-weight:700;line-height:1.5}
     .btn{width:100%;padding:13px;background:#B8A47A;color:#1C1A18;border:none;border-radius:8px;
          font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px}
     .btn:hover{background:#9A8660}

@@ -45,6 +45,11 @@ function pp_svg($name, $size = 18) {
 
 // Stav predaja (nad rámec typu predaj/prenájom): aktívne / rezervované / predané
 function pp_sale_states() {
+    if (function_exists('pp_catalog_rows')) {
+        $out = ['' => ''];
+        foreach (pp_catalog_rows('statuses') as $row) $out[$row['value']] = $row['label'];
+        return $out;
+    }
     return [
         ''            => '',
         'rezervovane' => 'Rezervované',
@@ -55,9 +60,24 @@ function pp_sale_state($pid) {
     $s = get_post_meta($pid, '_property_stav_predaja', true);
     return isset(pp_sale_states()[$s]) ? $s : '';
 }
-function pp_sale_badge($state) {
-    if ($state === 'rezervovane') return ['label' => 'Rezervované', 'bg' => '#C6902B', 'fg' => '#fff'];
-    if ($state === 'predane')     return ['label' => 'PREDANÉ',     'bg' => '#DC2626', 'fg' => '#fff'];
+function pp_sale_label($state, $type = '') {
+    if (function_exists('pp_offer_status_label')) return pp_offer_status_label($state, $type);
+    if ($state === 'rezervovane') return 'Rezervované';
+    if ($state === 'predane') return $type === 'prenajom' ? 'Prenajaté' : 'Predané';
+    return 'Aktívna';
+}
+function pp_sale_badge($state, $type = '') {
+    if (function_exists('pp_offer_status_row')) {
+        $row = pp_offer_status_row($state);
+        if ($row) {
+            $preset = pp_badge_preset($row['color']);
+            $label = pp_offer_status_label($state, $type);
+            $label = function_exists('mb_strtoupper') ? mb_strtoupper($label) : strtoupper($label);
+            return ['label'=>$label, 'bg'=>$preset['bg'], 'fg'=>$preset['fg'], 'shadow'=>$preset['shadow'], 'color'=>$row['color']];
+        }
+    }
+    if ($state === 'rezervovane') return ['label' => 'REZERVOVANÉ', 'bg' => '#C6902B', 'fg' => '#fff', 'color'=>'amber'];
+    if ($state === 'predane')     return ['label' => $type === 'prenajom' ? 'PRENAJATÉ' : 'PREDANÉ', 'bg' => '#DC2626', 'fg' => '#fff', 'color'=>'red'];
     return null;
 }
 
@@ -158,7 +178,7 @@ add_action('wp_ajax_pp_quick_status', function() {
     if (!$post || $post->post_type !== 'property') wp_send_json_error(['message' => 'Neplatná ponuka.']);
     if (!current_user_can('edit_post', $pid)) wp_send_json_error(['message' => 'Bez oprávnenia.']);
     update_post_meta($pid, '_property_stav_predaja', $st);
-    pp_log('Zmena stavu na „' . (pp_sale_states()[$st] ?: 'Aktívna') . '"', $pid);
+    pp_log('Zmena stavu na „' . pp_sale_label($st, get_post_meta($pid, '_property_typ', true)) . '"', $pid);
     wp_send_json_success(['status' => $st]);
 });
 
@@ -175,7 +195,7 @@ add_action('wp_ajax_pp_bulk', function() {
         if (!$post || $post->post_type !== 'property') continue;
         if ($op === 'delete') {
             if (current_user_can('delete_post', $pid)) { pp_log('Hromadne zmazaná ponuka', $pid); wp_delete_post($pid, true); $done++; }
-        } elseif (in_array($op, ['', 'rezervovane', 'predane'], true)) {
+        } elseif (isset(pp_sale_states()[$op])) {
             if (current_user_can('edit_post', $pid)) { update_post_meta($pid, '_property_stav_predaja', $op); $done++; }
         }
     }

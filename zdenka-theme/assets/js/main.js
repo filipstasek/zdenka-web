@@ -128,7 +128,7 @@ if (!document.getElementById('zcOv')) {
     // za prípadný EBOOK, aby bol vždy posledný.
     [['/', 'Domov'], ['/ponuky/', 'Ponuky'], ['/o-mne/', 'O mne'],
      ['/ako-pracujem/', 'Ako pracujem'], ['/odhad/', 'Odhad ZDARMA'],
-     ['/referencie/', 'Referencie'], ['/newsletter/', 'Newsletter']
+     ['/referencie/', 'Referencie'], ['/vip/', 'VIP']
     ].forEach(function (item) {
         var a = document.createElement('a');
         a.href = location.origin + item[0];

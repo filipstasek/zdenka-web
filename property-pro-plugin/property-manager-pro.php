@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Property Manager Pro
  * Description: Profesionálny real estate plugin na správu nehnuteľností
- * Version: 5.63
+ * Version: 5.70
  * Author: Filip
  */
 

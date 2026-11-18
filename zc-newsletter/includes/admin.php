@@ -29,10 +29,10 @@ add_action('admin_head', function() {
 
 add_action('admin_menu', function() {
     if (function_exists('zc_hub_slug')) {
-        add_submenu_page(zc_hub_slug(), 'Newsletter', 'Newsletter', 'manage_options',
+        add_submenu_page(zc_hub_slug(), 'VIP', 'VIP', 'manage_options',
             'zc-newsletter', 'zcn_admin_page');
     } else {
-        add_menu_page('ZC Newsletter', 'Newsletter ', 'manage_options',
+        add_menu_page('ZC VIP', 'VIP', 'manage_options',
             'zc-newsletter', 'zcn_admin_page', 'dashicons-email-alt', 26);
     }
 });
@@ -211,7 +211,7 @@ function zcn_admin_page() {
     }
     ?>
     <div class="wrap">
-    <h1 style="display:flex;align-items:center;gap:10px;font-size:22px">ZC Newsletter
+    <h1 style="display:flex;align-items:center;gap:10px;font-size:22px">ZC VIP
         <a href="?page=zc-newsletter&zcn_export=1" class="button" style="font-size:12px">Export CSV</a>
     </h1>
 
@@ -330,7 +330,7 @@ function zcn_admin_page() {
     <?php elseif ($tab === 'send'): ?>
     <div style="max-width:760px">
     <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:28px">
-        <h3 style="margin:0 0 20px">Odoslať newsletter</h3>
+        <h3 style="margin:0 0 20px">Odoslať VIP e-mail</h3>
         <div style="margin-bottom:16px">
             <label style="display:block;font-size:11px;font-weight:700;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Príjemcovia</label>
             <select id="zcnScope" onchange="zcnScopeChange()" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:8px">
@@ -351,7 +351,7 @@ function zcn_admin_page() {
             <label style="display:block;font-size:11px;font-weight:700;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Obsah *</label>
             <?php
             if (function_exists('zc_render_editor_tools')) {
-                zc_render_editor_tools('zcnBody', ['template'=>'newsletter','label'=>'Obsah newslettera']);
+                zc_render_editor_tools('zcnBody', ['template'=>'newsletter','label'=>'Obsah VIP e-mailu']);
             }
             $editor_settings = [
                 'textarea_name' => 'zcn_body',
@@ -475,9 +475,9 @@ function zcn_admin_page() {
             if (cats.length < boxes.length) interest = cats.join(',');
         } else if (scope === 'offers') { interest = 'offers'; }
         if (isSchedule && !sch) { alert('Zvoľte dátum a čas odoslania.'); return; }
-        if (isSchedule && !confirm('Naplánovať newsletter na ' + sch + '?')) return;
+        if (isSchedule && !confirm('Naplánovať VIP e-mail na ' + sch + '?')) return;
         var recipientCount=document.getElementById('zcnRecipientCount').textContent;
-        if (!isTest && !isSchedule && !confirm('Odoslať newsletter ' + recipientCount + ' odberateľom?')) return;
+        if (!isTest && !isSchedule && !confirm('Odoslať VIP e-mail ' + recipientCount + ' odberateľom?')) return;
         var data = new FormData();
         data.append('action','zcn_send_newsletter');
         data.append('nonce','<?php echo wp_create_nonce("zcn_send_nonce") ?>');
@@ -524,7 +524,7 @@ function zcn_admin_page() {
         <?php endforeach; ?>
         </tbody>
     </table>
-    <?php else: ?><p style="color:#aaa;padding:32px;text-align:center">Zatiaľ nebol odoslaný žiadny newsletter.</p><?php endif; ?>
+    <?php else: ?><p style="color:#aaa;padding:32px;text-align:center">Zatiaľ nebol odoslaný žiadny VIP e-mail.</p><?php endif; ?>
 
     <?php elseif ($tab === 'import'): ?>
     <?php // Rovnaké možnosti ako v realitnom paneli – po jednom aj hromadne ?>
@@ -555,7 +555,7 @@ function zcn_admin_page() {
                     <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px">Spôsob pridania</label>
                     <select name="zcn_add_mode" style="width:100%">
                         <option value="active">Aktívny – pridať priamo, bez e-mailu</option>
-                        <option value="pending">Poslať potvrdzovací e-mail</option>
+                        <option value="pending">Poslať pozvánku na potvrdenie VIP</option>
                     </select>
                 </p>
                 <button type="submit" class="button button-primary">Pridať kontakt</button>
@@ -577,7 +577,7 @@ function zcn_admin_page() {
                 <span style="display:block;font-size:11px;color:#6B6560;margin-top:4px">Nič nevybrané = pošleme všetko.</span>
                 <select name="zcn_import_mode" style="width:100%;margin-top:10px">
                     <option value="active">Pridať priamo, bez potvrdzovacieho e-mailu</option>
-                    <option value="pending">Poslať každému potvrdzovací e-mail</option>
+                    <option value="pending">Poslať každému pozvánku na potvrdenie VIP</option>
                 </select>
                 <button type="submit" name="zcn_import" value="1" class="button button-primary" style="margin-top:12px">Pridať celú dávku</button>
             </form>
@@ -593,7 +593,7 @@ function zcn_admin_page() {
         Aktívny kontakt pridávaj len vtedy, keď ti preukázateľne udelil súhlas.
         Zdroj sa uloží ako „Ručne vo wp-admine“, takže je vždy dohľadateľné, odkiaľ prišiel.
     </p>
-    
+
     <?php elseif ($tab === 'cats'): ?>
     <?php // Vlastné kategórie – premietnu sa všade: formulár, e-mail, panel aj filtre ?>
     <div style="max-width:820px">

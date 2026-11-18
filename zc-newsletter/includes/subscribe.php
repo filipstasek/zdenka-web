@@ -21,6 +21,7 @@ function zcn_handle_subscribe() {
     $interest = function_exists('zcn_sanitize_interests')
         ? zcn_sanitize_interests($_POST['interest'] ?? '')
         : '';
+    $interest_provided = !empty($_POST['interest_provided']);
     $source = function_exists('zcn_merge_sources')
         ? zcn_merge_sources('', $_POST['source'] ?? 'newsletter')
         : sanitize_key($_POST['source'] ?? 'newsletter');
@@ -42,13 +43,16 @@ function zcn_handle_subscribe() {
 
     if ($existing) {
         if ($existing->status === 'active') {
-            if ($interest || ($name && !$existing->name) || $source) {
+            if ($interest_provided || $interest || ($name && !$existing->name) || $source) {
                 $data = ['source' => zcn_merge_sources($existing->source ?? '', $source)];
-                if ($interest) $data['interest'] = $interest;
+                if ($interest_provided || $interest) $data['interest'] = $interest;
                 if ($name && !$existing->name) $data['name'] = $name;
                 if ($data) $wpdb->update($table, $data, ['id' => (int) $existing->id]);
             }
-            wp_send_json_error(['message' => 'Táto adresa už odber dostáva. Témy si viete zmeniť odkazom v ktoromkoľvek našom e-maile.']);
+            if ($interest_provided) {
+                wp_send_json_success(['message' => 'Hotovo – vaše VIP preferencie sme aktualizovali.']);
+            }
+            wp_send_json_error(['message' => 'Táto adresa už je vo VIP. Preferencie si môžete zmeniť odkazom v ktoromkoľvek e-maile.']);
         }
         // Čakajúci aj kedysi odhlásený sa prihlásia rovno – potvrdzovací
         // krok sme zrušili. Token vždy obnovíme, aby starý odkaz z e-mailu
@@ -67,7 +71,7 @@ function zcn_handle_subscribe() {
             wp_send_json_error(['message' => 'Prihlásenie sa nepodarilo uložiť. Skúste to, prosím, znova.']);
         }
         zcn_send_welcome($email, $name ?: (string) $existing->name);
-        wp_send_json_success(['message' => 'Hotovo – ste prihlásený na odber. Poslali sme vám uvítací e-mail.']);
+        wp_send_json_success(['message' => 'Vitajte vo VIP – poslali sme vám uvítací e-mail.']);
     }
 
     // Nový odberateľ – rovno aktívny, bez potvrdzovacieho e-mailu.
@@ -88,7 +92,7 @@ function zcn_handle_subscribe() {
     }
 
     zcn_send_welcome($email, $name);
-    wp_send_json_success(['message' => 'Hotovo – ste prihlásený na odber. Poslali sme vám uvítací e-mail.']);
+    wp_send_json_success(['message' => 'Vitajte vo VIP – poslali sme vám uvítací e-mail.']);
 }
 
 /**
@@ -99,10 +103,11 @@ function zcn_last_mail_error() {
     return sanitize_text_field((string) ($GLOBALS['zcn_last_mail_error'] ?? ''));
 }
 
-function zcn_send_confirmation($email, $name, $token) {
+function zcn_send_confirmation($email, $name, $token, $source = 'web') {
     $email = strtolower(sanitize_email($email));
     $name  = sanitize_text_field($name);
     $token = sanitize_text_field($token);
+    $source = sanitize_key($source);
     $GLOBALS['zcn_last_mail_error'] = '';
 
     if (!is_email($email) || $token === '') {
@@ -111,40 +116,56 @@ function zcn_send_confirmation($email, $name, $token) {
     }
 
     $confirm_url = add_query_arg(['zcn_action' => 'confirm', 'token' => $token], home_url('/'));
-    $unsub_url   = add_query_arg(['zcn_action' => 'unsubscribe', 'token' => $token], home_url('/'));
     $site        = function_exists('zc_agent') ? zc_agent('name', 'Mgr. Zdenka Cibuľová') : 'Mgr. Zdenka Cibuľová';
     $from_email  = function_exists('zc_mail_from') ? zc_mail_from() : (get_theme_mod('zc_email_from', '') ?: get_option('admin_email'));
     $greeting    = $name ? "Dobrý deň {$name}," : 'Dobrý deň,';
 
-    $subject = "Žiadosť o prihlásenie na odber – {$site}";
+    $manual_invitation = in_array($source, ['manual_admin', 'manual_panel', 'manual_batch', 'import'], true);
+    if ($manual_invitation) {
+        $subject = "{$site} vás pozýva do VIP";
+        $intro = "
+            <strong>{$site}</strong> vás pozýva do svojho VIP klubu s ponukami nehnuteľností.
+            Ak chcete pozvánku prijať, otvorte si výber a označte typy ponúk, ktoré vás zaujímajú.
+        ";
+        $button_label = 'Prijať VIP pozvánku';
+        $footer_note = 'Ak pozvánku nechcete prijať, tento e-mail jednoducho ignorujte.<br>
+            Bez výberu ponúk a finálneho potvrdenia vás do VIP nezaradíme.';
+    } else {
+        $subject = "Dokončite vstup do VIP – {$site}";
+        $intro = "
+            ďakujeme za váš záujem o <strong>VIP odber ponúk</strong> od {$site}.
+            Otvorte si výber a označte typy ponúk, ktoré vás zaujímajú.
+        ";
+        $button_label = 'Vybrať ponuky a dokončiť vstup';
+        $footer_note = 'Ak ste VIP odber vo formulári neoznačili, tento e-mail jednoducho ignorujte.<br>
+            Bez výberu ponúk a finálneho potvrdenia vás do VIP nezaradíme.';
+    }
+
     $body    = zcn_email_wrap($subject, "
         <p style='font-size:16px;color:#2C2825;margin:0 0 18px'>{$greeting}</p>
         <p style='color:#555;line-height:1.75;margin:0 0 18px'>
-            prišla nám žiadosť o prihlásenie na odber z webu <strong>{$site}</strong>.
-            Ak ste to boli vy, potvrďte ju tlačidlom nižšie.
+            {$intro}
         </p>
-        <p style='color:#555;line-height:1.75;margin:0 0 10px'><strong>Čo vám budeme posielať:</strong></p>
+        <p style='color:#555;line-height:1.75;margin:0 0 10px'><strong>Čo získate vo VIP:</strong></p>
         <ul style='color:#555;line-height:1.9;margin:0 0 18px;padding-left:20px'>
             <li>nové ponuky nehnuteľností skôr, než sa dostanú na inzertné portály,</li>
             <li>zníženia cien a novinky pri ponukách, ktoré vás zaujímajú,</li>
-            <li>ebook a materiály zdarma k predaju a kúpe nehnuteľnosti,</li>
-            <li>realitné tipy – čo si postrážiť pri zmluve, hypotéke či obhliadke.</li>
+            <li>užitočné informácie k ponukám a obhliadkam.</li>
         </ul>
         <p style='color:#555;line-height:1.75;margin:0 0 24px'>
-            Po potvrdení si <strong>sami vyberiete, čo vás zaujíma</strong> – môžete si označiť aj viac
-            možností naraz a kedykoľvek to zmeniť. Odhlásiť sa dá jedným klikom v každom e-maile.
+            Vybrať sa dá aj viac možností. Do VIP vás zaradíme až po označení ponúk
+            a stlačení finálneho potvrdzovacieho tlačidla na nasledujúcej stránke.
         </p>
         <div style='text-align:center;margin:30px 0'>
             <a href='" . esc_url($confirm_url) . "'
                style='display:inline-block;padding:14px 32px;background:#B8A47A;color:#1C1A18;
                       text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;
                       letter-spacing:.5px;font-family:DM Sans,sans-serif'>
-                Prihlásiť sa a vybrať si témy
+                {$button_label}
             </a>
         </div>
         <p style='font-size:12px;color:#6B6560;text-align:center'>
-            Ak ste o prihlásenie nežiadali, tento e-mail pokojne ignorujte – bez potvrdenia vám nič neprí­de.<br>
-            <a href='" . esc_url($unsub_url) . "' style='color:#bbb'>Odhlásiť sa</a>
+            {$footer_note}
         </p>
     ");
 
@@ -218,7 +239,7 @@ function zcn_resend_confirmation($subscriber_id, $source = 'manual_panel') {
         return new WP_Error('zcn_save_failed', 'Nový potvrdzovací token sa nepodarilo uložiť.');
     }
 
-    if (!zcn_send_confirmation($row->email, $row->name, $token)) {
+    if (!zcn_send_confirmation($row->email, $row->name, $token, $source)) {
         // Odošlanie neprešlo: kontakt nesmie zostať v inom stave než pred kliknutím.
         $wpdb->update($table, $original, ['id' => (int) $row->id]);
         $detail = zcn_last_mail_error();
@@ -297,41 +318,44 @@ function zcn_send_welcome($email, $name = '') {
     $site       = function_exists('zc_agent') ? zc_agent('name', 'Mgr. Zdenka Cibuľová') : 'Mgr. Zdenka Cibuľová';
     $from_email = function_exists('zc_mail_from') ? zc_mail_from() : (get_theme_mod('zc_email_from', '') ?: get_option('admin_email'));
     $greeting   = $name ? "Dobrý deň {$name}," : 'Dobrý deň,';
-    $subject    = "Vitajte v odbere noviniek — {$site}";
+    $subject    = "Vitajte vo VIP — {$site}";
 
     // Token odberateľa → odkaz na úpravu tém aj na odhlásenie
-    $token = $wpdb->get_var($wpdb->prepare("SELECT token FROM " . zcn_table() . " WHERE email=%s", $email));
+    $row = $wpdb->get_row($wpdb->prepare("SELECT token, interest FROM " . zcn_table() . " WHERE email=%s", $email));
+    $token = $row ? (string) $row->token : '';
+    $interest = $row ? (string) $row->interest : '';
     $unsub = $token ? zcn_unsubscribe_url($token) : home_url('/');
     $prefs = $token
         ? add_query_arg(['zcn_action' => 'prefs', 'token' => $token], home_url('/'))
-        : home_url('/newsletter/');
-    $footer = 'Dostávate tento e-mail, pretože ste sa prihlásili na odber noviniek. · <a href="' . esc_url($unsub) . '" style="color:#9A8660">Odhlásiť sa</a><br>';
+        : home_url('/vip/');
+    $footer = 'Dostávate tento e-mail, pretože ste vstúpili do VIP odberu. · <a href="' . esc_url($unsub) . '" style="color:#9A8660">Odhlásiť sa</a><br>';
+    $interest_text = function_exists('zcn_interest_label')
+        ? zcn_interest_label($interest, 'Všetky nové ponuky')
+        : 'Všetky nové ponuky';
 
-    // Prihlásenie je okamžité a na všetko. Tento e-mail preto nič nepotvrdzuje –
-    // len povie, čo bude chodiť, a dá dve možnosti: zúžiť témy alebo odísť.
+    // Prihlásenie je okamžité. E-mail nič nepotvrdzuje – zhrnie uložený výber
+    // a ponúkne bezpečný odkaz na jeho neskoršiu zmenu alebo odhlásenie.
     $body = zcn_email_wrap($subject, "
         <p style='font-size:16px;color:#2C2825;margin:0 0 18px'>{$greeting}</p>
         <p style='color:#555;line-height:1.75;margin:0 0 18px'>
-            odteraz vám posielam novinky z realitného trhu. Nastavené to máte
-            <strong>na všetko</strong> – nič ďalšie robiť nemusíte.
+            ďakujem za vstup do VIP. Nové ponuky podľa vášho výberu vám budú
+            chodiť priamo do e-mailu.
         </p>
-        <p style='color:#555;line-height:1.75;margin:0 0 10px'><strong>Čo vám bude chodiť:</strong></p>
+        <p style='color:#555;line-height:1.75;margin:0 0 10px'><strong>Váš výber:</strong> " . esc_html($interest_text) . "</p>
         <ul style='color:#555;line-height:1.9;margin:0 0 20px;padding-left:20px'>
             <li>nové ponuky nehnuteľností skôr, než sa dostanú na inzertné portály,</li>
             <li>zníženia cien a novinky pri ponukách, ktoré vás zaujímajú,</li>
-            <li>ebook a materiály zdarma k predaju a kúpe nehnuteľnosti,</li>
-            <li>realitné tipy – čo si postrážiť pri zmluve, hypotéke či obhliadke.</li>
+            <li>užitočné informácie k ponukám a obhliadkam.</li>
         </ul>
         <p style='color:#555;line-height:1.75;margin:0 0 22px'>
-            Ak je toho priveľa, vyberte si len to, čo vás naozaj zaujíma.
-            Označiť sa dá aj viac možností naraz a kedykoľvek to zmeníte.
+            Výber môžete kedykoľvek zmeniť. Označiť sa dá aj viac typov ponúk naraz.
         </p>
         <div style='text-align:center;margin:26px 0 20px'>
             <a href='" . esc_url($prefs) . "'
                style='display:inline-block;padding:14px 32px;background:#B8A47A;color:#1C1A18;
                       text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;
                       letter-spacing:.5px;font-family:DM Sans,sans-serif'>
-                Zmeniť si témy
+                Zmeniť VIP preferencie
             </a>
         </div>
         <p style='font-size:12.5px;color:#8A8078;text-align:center;line-height:1.7;margin:0 0 4px'>
@@ -414,7 +438,7 @@ function zcn_subscribe_direct($email, $name = '', $source = 'web', $interest = '
         $saved = $wpdb->insert($table, ['email'=>$email,'name'=>$name,'status'=>'pending','token'=>$token,'source'=>$source,'interest'=>$interest]);
     }
     if ($saved === false) return false;
-    return zcn_send_confirmation($email, $name, $token);
+    return zcn_send_confirmation($email, $name, $token, $source);
 }
 
 /* ── Ručné pridávanie kontaktov (wp-admin aj realitný panel) ──────────────
@@ -534,7 +558,7 @@ function zcn_bulk_notice($counts) {
     if (!empty($counts['failed']))         $msg .= ' Neuložené pre chybu databázy: ' . (int) $counts['failed'] . '.';
     if (!empty($counts['truncated']))      $msg .= ' Naraz sa spracuje najviac 500 riadkov; zvyšok vlož v ďalšej dávke.';
     $msg .= (($counts['mode'] ?? 'active') === 'pending')
-        ? ' Každému odišiel potvrdzovací e-mail.'
+        ? ' Každému odišla VIP pozvánka na potvrdenie.'
         : ' Žiadne e-maily sa neposielali.';
 
     $ok = ($counts['created'] + $counts['reactivated'] + $counts['updated']) > 0 && empty($counts['failed']);
@@ -552,7 +576,7 @@ function zcn_add_contact($email, $name = '', $interest = '', $mode = 'active', $
 
     if ($mode === 'pending') {
         $ok = zcn_subscribe_direct($email, $name, $source, $interest);
-        if ($ok) return ['Kontakt bol pridaný a dostal potvrdzovací e-mail.', true];
+        if ($ok) return ['Kontakt bol pridaný a dostal VIP pozvánku na potvrdenie.', true];
         $err = function_exists('zcn_last_mail_error') ? zcn_last_mail_error() : '';
         return [$err
             ? 'Kontakt bol uložený, ale e-mail sa nepodarilo odoslať. Dôvod: ' . $err

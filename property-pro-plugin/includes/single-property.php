@@ -41,7 +41,7 @@ $znizena    = pp_price_num($cena_pov) > pp_price_num($cena_raw) && pp_price_num(
 $per_m2     = pp_price_per_m2($cena_raw, $plocha);
 $energie    = get_post_meta($id, '_property_energie', true);
 $sale       = pp_sale_state($id);
-$sale_badge = pp_sale_badge($sale);
+$sale_badge = pp_sale_badge($sale, $typ);
 $note_int   = get_post_meta($id, '_property_poznamka', true);
 pp_bump_views($id);
 $views      = (int) get_post_meta($id, '_property_views', true);
@@ -56,11 +56,11 @@ $agent_email = $agent['email'];
 $agent_photo = $agent['photo'];
 $agent_title = $agent['title'];
 
-$types     = ['predaj' => 'Na predaj', 'prenajom' => 'Na prenájom', 'pozemok' => 'Pozemok'];
+$types     = function_exists('pp_property_types') ? pp_property_types($typ) : ['predaj' => 'Na predaj', 'prenajom' => 'Na prenájom', 'pozemok' => 'Pozemok'];
 $typ_label = $types[$typ] ?? 'Ponuka';
-$typ_colors = ['predaj' => '#B8A47A', 'prenajom' => '#FFFFFF', 'pozemok' => '#6a9e77'];
-$typ_color  = $typ_colors[$typ] ?? '#B8A47A';
-$typ_text_color = $typ === 'pozemok' ? '#fff' : '#1C1A18';
+$typ_badge = function_exists('pp_property_type_badge') ? pp_property_type_badge($typ) : null;
+$typ_color = $typ_badge['bg'] ?? '#B8A47A';
+$typ_text_color = $typ_badge['fg'] ?? '#1C1A18';
 
 // Robustne – žiadne prázdne/nulové/duplicitné obrázky
 $raw_ids    = array_merge($cover_id ? [$cover_id] : [], is_array($gallery_ids) ? $gallery_ids : []);
@@ -131,6 +131,7 @@ $all_amenities = get_property_amenities();
 @media(prefers-reduced-motion:reduce){.pp-hero-badge.is-new{animation:none;box-shadow:0 7px 20px rgba(15,121,86,.48),0 0 16px rgba(67,223,162,.58)!important}}
 .pp-hero-badge.is-reduced{background:linear-gradient(135deg,#EF6B5A,#B62E28)!important;color:#fff!important}
 .pp-hero-badge.is-reserved{background:linear-gradient(135deg,#F6B944,#C77912)!important;color:#3D2705!important;text-shadow:none;box-shadow:0 7px 20px rgba(199,121,18,.42),0 0 18px rgba(246,185,68,.34)!important}
+.pp-hero-badge.pp-custom-badge.pp-custom-badge{background:var(--pp-badge-bg)!important;color:var(--pp-badge-fg)!important}
 .pp-hero-title {
     font-size:clamp(22px,4vw,40px); font-weight:800; line-height:1.2;
     font-family:var(--serif,'Playfair Display',serif);
@@ -451,10 +452,10 @@ textarea.pp-cta-input { resize:vertical; min-height:84px; max-height:280px; }
     </button>
     <div class="pp-hero-info">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-            <?php if ($typ): ?><span class="pp-hero-badge type-<?php echo esc_attr($typ) ?>" style="margin:0"><?php echo $typ_label ?></span><?php endif; ?>
+            <?php if ($typ): ?><span class="pp-hero-badge pp-custom-badge type-<?php echo esc_attr($typ) ?>" style="margin:0;--pp-badge-bg:<?php echo esc_attr($typ_color) ?>;--pp-badge-fg:<?php echo esc_attr($typ_text_color) ?>;box-shadow:<?php echo esc_attr($typ_badge['shadow']??'0 7px 20px rgba(0,0,0,.24)') ?>!important"><?php echo esc_html($typ_label) ?></span><?php endif; ?>
             <?php if (pp_is_new($id) && !$sale): ?><span class="pp-hero-badge is-new" style="margin:0">Nové</span><?php endif; ?>
             <?php if ($znizena && !$sale): ?><span class="pp-hero-badge is-reduced" style="margin:0">Znížená cena</span><?php endif; ?>
-            <?php if ($sale_badge): ?><span class="pp-hero-badge <?php echo $sale === 'predane' ? 'is-sold' : 'is-reserved' ?>" style="margin:0"><?php echo $sale_badge['label'] ?></span><?php endif; ?>
+            <?php if ($sale_badge): ?><span class="pp-hero-badge pp-custom-badge <?php echo $sale === 'predane' ? 'is-sold' : ($sale === 'rezervovane' ? 'is-reserved' : 'is-status') ?>" style="margin:0;--pp-badge-bg:<?php echo esc_attr($sale_badge['bg']) ?>;--pp-badge-fg:<?php echo esc_attr($sale_badge['fg']) ?>;box-shadow:<?php echo esc_attr($sale_badge['shadow']??'none') ?>!important"><?php echo esc_html($sale_badge['label']) ?></span><?php endif; ?>
         </div>
         <h1 class="pp-hero-title"><?php the_title() ?></h1>
         <?php if ($lokalita || $plocha || $spalne): ?>

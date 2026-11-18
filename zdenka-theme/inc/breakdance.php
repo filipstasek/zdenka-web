@@ -175,7 +175,7 @@ add_shortcode('zc_contact_form', function ($atts) {
                 <?php if ($show_newsletter): ?>
                 <label class="zcb-contact-check">
                     <input type="checkbox" name="newsletter">
-                    <span>Chcem dostávať novinky a nové ponuky nehnuteľností na e-mail.</span>
+                    <span>Chcem byť vo VIP a dostávať nové ponuky nehnuteľností na e-mail.</span>
                 </label>
                 <?php endif; ?>
                 <button type="submit" class="zcb-contact-submit"><?php echo esc_html($atts['button']); ?> →</button>

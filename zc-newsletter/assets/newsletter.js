@@ -32,6 +32,7 @@ document.querySelectorAll('.zcn-form').forEach(function (form) {
         data.append('email',    form.querySelector('[name=zcn_email]').value);
         data.append('name',     (form.querySelector('[name=zcn_name]') || {}).value || '');
         data.append('interest', picks.join(','));
+        data.append('interest_provided', form.dataset.hasInterest || '0');
         data.append('source',   form.dataset.source || 'newsletter');
 
         fetch(zcnData.ajaxurl, { method: 'POST', body: data })

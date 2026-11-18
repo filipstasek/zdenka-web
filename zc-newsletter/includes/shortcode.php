@@ -1,8 +1,8 @@
 <?php
 defined('ABSPATH') || exit;
 
-// [zc_newsletter] – kompaktný formulár bez otázky na kategóriu.
-// [zc_newsletter_full] – plný formulár na samostatnej stránke Newsletter.
+// [zc_newsletter] – spätná kompatibilita pre staršie vložené formuláre.
+// [zc_vip] – hlavný VIP formulár s výberom typov ponúk.
 function zcn_newsletter_shortcode($atts) {
     $atts = shortcode_atts([
         'title'       => 'Odber noviniek',
@@ -10,12 +10,18 @@ function zcn_newsletter_shortcode($atts) {
         'source'      => 'newsletter',
         'dark'        => '0',
         'show_interest'=> '0',
+        'offers_only'  => '0',
+        'button'       => 'Prihlásiť →',
         'full'         => '0',
     ], $atts);
 
     $dark = $atts['dark'] === '1';
     $full = $atts['full'] === '1';
     $show_interest = $atts['show_interest'] === '1';
+    $offers_only   = $atts['offers_only'] === '1';
+    $interest_groups = $offers_only
+        ? ['Ponuky' => zcn_offer_interests()]
+        : zcn_interest_groups();
     $bg   = $dark ? '#1C1A18' : '#F2EEE8';
     $text = $dark ? '#fff'     : '#2C2825';
     $sub  = $dark ? 'rgba(255,255,255,.65)' : '#746A62';
@@ -26,7 +32,7 @@ function zcn_newsletter_shortcode($atts) {
     );
     // Kategórie posielame do JS, nech ich okno na úpravu tém vie vykresliť
     $zcn_groups = [];
-    foreach (zcn_interest_groups() as $glabel => $items) {
+    foreach ($interest_groups as $glabel => $items) {
         $opts = [];
         foreach ($items as $value => $label) $opts[] = ['value' => $value, 'label' => $label];
         if ($opts) $zcn_groups[] = ['group' => $glabel, 'items' => $opts];
@@ -83,7 +89,7 @@ function zcn_newsletter_shortcode($atts) {
         <?php if ($atts['description']): ?>
         <p style="font-size:14px;color:<?php echo $sub ?>;margin-bottom:20px;line-height:1.7"><?php echo esc_html($atts['description']); ?></p>
         <?php endif; ?>
-        <form class="zcn-form" data-source="<?php echo esc_attr($atts['source']); ?>">
+        <form class="zcn-form" data-source="<?php echo esc_attr($atts['source']); ?>" data-has-interest="<?php echo $show_interest ? '1' : '0'; ?>">
             <div style="display:flex;flex-direction:column;gap:10px">
                 <input type="text" name="zcn_name" placeholder="Vaše meno (nepovinné)"
                     style="padding:13px 16px;border:1.5px solid <?php echo $dark ? 'rgba(255,255,255,.2)' : '#E0D8CE' ?>;border-radius:8px;
@@ -92,7 +98,7 @@ function zcn_newsletter_shortcode($atts) {
                 <?php if ($show_interest): ?>
                 <div class="zcn-picks">
                     <div class="zcn-picks-hd" style="color:<?php echo $sub ?>">Čo vás zaujíma? <span>(môžete označiť aj viac)</span></div>
-                    <?php foreach (zcn_interest_groups() as $glabel => $items): ?>
+                    <?php foreach ($interest_groups as $glabel => $items): ?>
                     <div class="zcn-picks-grp" style="color:<?php echo $sub ?>"><?php echo esc_html($glabel); ?></div>
                     <div class="zcn-picks-row">
                         <?php foreach ($items as $value => $label): ?>
@@ -103,7 +109,7 @@ function zcn_newsletter_shortcode($atts) {
                         <?php endforeach; ?>
                     </div>
                     <?php endforeach; ?>
-                    <div class="zcn-picks-note" style="color:<?php echo $sub ?>">Nič neoznačené = pošleme vám všetko.</div>
+                    <div class="zcn-picks-note" style="color:<?php echo $sub ?>">Ak nič neoznačíte, pošleme vám všetky nové ponuky.</div>
                 </div>
                 <?php endif; ?>
                 <div class="zcn-email-row">
@@ -115,20 +121,20 @@ function zcn_newsletter_shortcode($atts) {
                         style="padding:13px 20px;background:#B8A47A;color:#1C1A18;border:none;border-radius:8px;
                                font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;
                                cursor:pointer;white-space:nowrap;transition:all .2s">
-                        Prihlásiť →
+                        <?php echo esc_html($atts['button']); ?>
                     </button>
                 </div>
                 <?php if ($full): ?>
                 <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;color:<?php echo $sub ?>;cursor:pointer;line-height:1.6;margin-top:3px">
                     <input type="checkbox" required style="min-height:auto;margin-top:3px;accent-color:#B8A47A;flex:0 0 auto">
-                    <span>Súhlasím so <a href="<?php echo esc_url(home_url('/ochrana-osobnych-udajov/')) ?>" style="color:#7C5E33">spracovaním osobných údajov</a> na účel zasielania newslettera. *</span>
+                    <span>Súhlasím so <a href="<?php echo esc_url(home_url('/ochrana-osobnych-udajov/')) ?>" style="color:#7C5E33">spracovaním osobných údajov</a> na účel zasielania VIP ponúk. *</span>
                 </label>
                 <?php endif; ?>
             </div>
             <div class="zcn-msg" style="display:none;margin-top:12px;padding:12px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif"></div>
 
             <p style="font-size:11px;color:<?php echo $sub ?>;margin-top:10px;line-height:1.6">
-                Odoslaním súhlasíte so spracovaním e-mailovej adresy za účelom zasielania noviniek.
+                E-mail použijeme iba na zasielanie VIP ponúk a súvisiacich realitných informácií.
                 Odhlásiť sa môžete kedykoľvek kliknutím na odkaz v e-maile.
             </p>
         </form>
@@ -138,46 +144,61 @@ function zcn_newsletter_shortcode($atts) {
 }
 add_shortcode('zc_newsletter', 'zcn_newsletter_shortcode');
 
-add_shortcode('zc_newsletter_full', function() {
+function zcn_vip_page_shortcode() {
     ob_start(); ?>
-    <section class="zcn-page" style="background:#FCFBF8;padding:72px 20px 90px;min-height:65vh">
-        <div style="max-width:760px;margin:0 auto;text-align:center">
-            <div style="font:700 11px/1.2 'DM Sans',sans-serif;letter-spacing:2px;text-transform:uppercase;color:#7C5E33;margin-bottom:13px">Newsletter</div>
-            <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(34px,6vw,56px);line-height:1.12;color:#1C1A18;margin:0 0 15px">Ponuky a realitné tipy <em style="color:#7C5E33">priamo do e-mailu</em></h1>
-            <p style="max-width:620px;margin:0 auto 34px;color:#6B6560;font:16px/1.75 'DM Sans',sans-serif">Vyberte si, čo vás zaujíma – môžete označiť aj viac možností naraz. Pri novej relevantnej ponuke alebo užitočnej realitnej informácii budete medzi prvými, ktorí sa o nej dozvedia. Odhlásiť sa dá jedným klikom v každom e-maile.</p>
+    <section class="zcn-page zcn-vip-page" style="background:linear-gradient(145deg,#FCFBF8 0%,#F1E8D8 100%);padding:clamp(64px,9vw,112px) 20px 100px;min-height:72vh">
+        <div style="max-width:820px;margin:0 auto;text-align:center">
+            <div style="display:inline-flex;align-items:center;gap:9px;font:800 11px/1.2 'DM Sans',sans-serif;letter-spacing:2.4px;text-transform:uppercase;color:#7C5E33;margin-bottom:16px;padding:8px 14px;border:1px solid rgba(124,94,51,.25);border-radius:99px;background:rgba(255,255,255,.58)">VIP · Ponuky pre vás</div>
+            <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(38px,7vw,64px);line-height:1.08;color:#1C1A18;margin:0 0 18px">Buďte medzi prvými,<br><em style="color:#7C5E33">ktorí uvidia novú ponuku</em></h1>
+            <p style="max-width:650px;margin:0 auto 38px;color:#62594F;font:16px/1.75 'DM Sans',sans-serif">Zadajte e-mail a označte typy nehnuteľností, ktoré hľadáte. Keď pribudne zodpovedajúca ponuka, dostanete ju priamo do schránky.</p>
             <?php echo zcn_newsletter_shortcode([
-                'title'         => 'Prihlásenie na odber',
-                'description'   => 'Označte, čo vás zaujíma – a nechajte nám e-mail. Nič viac netreba.',
-                'source'        => 'newsletter_page',
+                'title'         => 'Vstúpte do VIP',
+                'description'   => 'Vyberte si jednu alebo viac možností. Ak nevyberiete nič, budete dostávať všetky nové ponuky.',
+                'source'        => 'vip_page',
                 'show_interest' => '1',
+                'offers_only'   => '1',
+                'button'        => 'Vstúpiť do VIP →',
                 'full'          => '1',
             ]); ?>
+            <p style="margin:22px auto 0;color:#746A62;font:12px/1.6 'DM Sans',sans-serif">Bez spamu. Svoje preferencie môžete kedykoľvek zmeniť a odhlásenie je na jeden klik.</p>
         </div>
     </section>
     <?php
     return ob_get_clean();
-});
+}
+add_shortcode('zc_vip', 'zcn_vip_page_shortcode');
+add_shortcode('zc_vip_full', 'zcn_vip_page_shortcode');
+add_shortcode('zc_newsletter_full', 'zcn_vip_page_shortcode');
 
-/** Vytvorí samostatnú stránku iba raz; existujúci vlastný obsah neprepisuje. */
-function zcn_ensure_newsletter_page() {
-    if (get_option('zcn_newsletter_page_v') === '1') return;
-    $page = get_page_by_path('newsletter', OBJECT, 'page');
+/** Vytvorí /vip bez mazania starej stránky alebo existujúcich kontaktov. */
+function zcn_ensure_vip_page() {
+    if (get_option('zcn_vip_page_v') === '1') return;
+    $page = get_page_by_path('vip', OBJECT, 'page');
     if (!$page) {
         $id = wp_insert_post([
             'post_type'    => 'page',
             'post_status'  => 'publish',
-            'post_title'   => 'Newsletter',
-            'post_name'    => 'newsletter',
-            'post_content' => '[zc_newsletter_full]',
+            'post_title'   => 'VIP',
+            'post_name'    => 'vip',
+            'post_content' => '[zc_vip]',
         ]);
         if (is_wp_error($id) || !$id) return;
-    } elseif (strpos((string) $page->post_content, '[zc_newsletter_full]') === false) {
+    } elseif (strpos((string) $page->post_content, '[zc_vip]') === false) {
         $content = trim((string) $page->post_content);
-        $content = ($content === '' || $content === '[zc_newsletter]')
-            ? '[zc_newsletter_full]'
-            : $content . "\n\n[zc_newsletter_full]";
+        $legacy = ['[zc_newsletter]', '[zc_newsletter_full]', '[zc_vip_full]'];
+        $content = ($content === '' || in_array($content, $legacy, true))
+            ? '[zc_vip]'
+            : $content . "\n\n[zc_vip]";
         wp_update_post(['ID' => $page->ID, 'post_content' => $content]);
     }
-    update_option('zcn_newsletter_page_v', '1', false);
+    update_option('zcn_vip_page_v', '1', false);
 }
-add_action('init', 'zcn_ensure_newsletter_page', 20);
+add_action('init', 'zcn_ensure_vip_page', 20);
+
+/** Staré odkazy na /newsletter ostanú funkčné a bezpečne prejdú na /vip. */
+add_action('template_redirect', function () {
+    if (!is_admin() && is_page('newsletter')) {
+        wp_safe_redirect(home_url('/vip/'), 301);
+        exit;
+    }
+});

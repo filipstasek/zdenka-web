@@ -164,7 +164,7 @@ $email = zc_agent('email', get_option('admin_email'));
                     </div>
                     <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);cursor:pointer;line-height:1.6;margin-bottom:16px">
                         <input type="checkbox" name="newsletter" style="margin-top:2px;accent-color:var(--accent);flex-shrink:0">
-                        <span>Chcem dostávať novinky a nové ponuky nehnuteľností na e-mail.</span>
+                        <span>Chcem byť vo VIP a dostávať nové ponuky nehnuteľností na e-mail.</span>
                     </label>
                     <button type="submit" class="ko-submit">Odoslať správu →</button>
                     <span class="ko-note" style="text-align:center">Ozvem sa najskôr do <strong>24 hodín</strong></span>

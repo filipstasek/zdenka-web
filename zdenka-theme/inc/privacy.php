@@ -41,7 +41,7 @@ function zc_privacy_default_content() {
 <ul>
 <li><strong>Identifikačné a kontaktné údaje:</strong> meno a priezvisko, e-mailová adresa, telefónne číslo;</li>
 <li><strong>Údaje z formulárov</strong> (kontaktný formulár, formulár na odhad nehnuteľnosti, dopyt k ponuke, formulár na stiahnutie e-booku): obsah vašej správy, údaje o nehnuteľnosti a odpovede na položené otázky, ktoré nám dobrovoľne poskytnete;</li>
-<li><strong>Údaje pri odbere noviniek (newsletter):</strong> e-mailová adresa, prípadne meno a zvolená kategória nehnuteľností;</li>
+<li><strong>Údaje pri VIP odbere ponúk (newsletter):</strong> e-mailová adresa, prípadne meno a zvolené kategórie nehnuteľností;</li>
 <li><strong>Údaje o udelení súhlasu a technické údaje formulára:</strong> IP adresa a dátum a čas odoslania formulára – uchovávame ich ako doklad o udelení súhlasu a na ochranu pred zneužívaním formulárov (spam);</li>
 <li><strong>Ostatné technické údaje:</strong> typ a nastavenia prehliadača a údaje z cookies (pozri bod 7).</li>
 </ul>
@@ -58,7 +58,7 @@ function zc_privacy_default_content() {
 <li><strong>Vybavenie dopytu a komunikácia</strong> – vykonanie opatrení pred uzatvorením zmluvy na vašu žiadosť, resp. oprávnený záujem odpovedať na vaše otázky (čl. 6 ods. 1 písm. b) a f) GDPR).</li>
 <li><strong>Sprostredkovanie predaja, kúpy alebo prenájmu nehnuteľnosti</strong> – plnenie zmluvy, resp. predzmluvné vzťahy (čl. 6 ods. 1 písm. b) GDPR).</li>
 <li><strong>Poskytnutie e-booku (PDF na stiahnutie)</strong> – zaslanie vyžiadaného materiálu na váš e-mail na základe vašej žiadosti a súhlasu udeleného pri odoslaní formulára (čl. 6 ods. 1 písm. a) a b) GDPR).</li>
-<li><strong>Zasielanie noviniek a ponúk (newsletter)</strong> – na základe vášho súhlasu (čl. 6 ods. 1 písm. a) GDPR), ktorý môžete kedykoľvek odvolať. Súhlas so zasielaním noviniek udeľujete aj pri stiahnutí e-booku, o čom ste pred odoslaním formulára viditeľne informovaní.</li>
+<li><strong>Zasielanie VIP ponúk a súvisiacich noviniek (newsletter)</strong> – na základe vášho súhlasu (čl. 6 ods. 1 písm. a) GDPR), ktorý môžete kedykoľvek odvolať. Súhlas so zasielaním udeľujete aj pri stiahnutí e-booku, o čom ste pred odoslaním formulára viditeľne informovaní.</li>
 <li><strong>Ochrana webu a formulárov pred zneužitím (spam) a preukázanie udeleného súhlasu</strong> – na základe oprávneného záujmu prevádzkovateľa (čl. 6 ods. 1 písm. f) GDPR); na tento účel spracúvame IP adresu a čas odoslania formulára.</li>
 <li><strong>Plnenie zákonných povinností</strong> – najmä účtovných a daňových (čl. 6 ods. 1 písm. c) GDPR).</li>
 </ul>
@@ -98,10 +98,10 @@ function zc_privacy_default_content() {
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>8. Odber noviniek (newsletter) a stiahnutie e-booku</h2>
+<h2>8. VIP odber ponúk (newsletter) a stiahnutie e-booku</h2>
 <!-- /wp:heading -->
 <!-- wp:paragraph -->
-<p>Ak ste sa prihlásili na odber noviniek – či už priamo, alebo v rámci stiahnutia e-booku – spracúvame vašu e-mailovú adresu (prípadne meno) na základe súhlasu. Pred odoslaním formulára ste o prihlásení na odber viditeľne informovaní. Z odberu sa môžete <strong>kedykoľvek bezplatne odhlásiť</strong> kliknutím na odkaz „Odhlásiť sa" v pätičke každého e-mailu alebo napísaním na {{EMAIL}}. Odvolanie súhlasu nemá vplyv na zákonnosť spracúvania pred jeho odvolaním.</p>
+<p>Ak ste vstúpili do VIP odberu ponúk – či už priamo, alebo v rámci stiahnutia e-booku – spracúvame vašu e-mailovú adresu (prípadne meno a vybrané kategórie záujmu) na základe súhlasu. Pred odoslaním formulára ste o prihlásení na odber viditeľne informovaní. Z odberu sa môžete <strong>kedykoľvek bezplatne odhlásiť</strong> kliknutím na odkaz „Odhlásiť sa" v pätičke každého e-mailu alebo napísaním na {{EMAIL}}. Odvolanie súhlasu nemá vplyv na zákonnosť spracúvania pred jeho odvolaním.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->

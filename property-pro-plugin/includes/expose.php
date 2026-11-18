@@ -24,7 +24,7 @@ add_action('template_redirect', function() {
     if (!$agent_email) $agent_email = get_theme_mod('zc_email_main', '');
     $agent_title = $agent_data['title'] ?? (get_user_meta($agent_id, 'property_title', true) ?: 'Realitná maklérka');
 
-    $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+    $typ_labels = function_exists('pp_property_types') ? pp_property_types($typ) : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
     $cover = $cover_id ? wp_get_attachment_image_url($cover_id, 'large') : (has_post_thumbnail($id) ? get_the_post_thumbnail_url($id, 'large') : '');
     $all_am = get_property_amenities();
     $per_m2 = pp_price_per_m2($cena_raw, get_post_meta($id, '_property_plocha', true));

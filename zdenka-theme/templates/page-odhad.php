@@ -259,7 +259,7 @@ if (isset($_POST['odhad_send']) && !wp_verify_nonce($_POST['odhad_nonce'] ?? '',
                         </label>
                         <label class="odhad-gdpr" style="margin-top:8px">
                             <input type="checkbox" name="newsletter">
-                            <span>Chcem dostávať novinky a nové ponuky nehnuteľností na e-mail.</span>
+                            <span>Chcem byť vo VIP a dostávať nové ponuky nehnuteľností na e-mail.</span>
                         </label>
                     </div>
                     <button type="submit" name="odhad_send" class="odhad-submit">Vyžiadať odhad ZDARMA</button>

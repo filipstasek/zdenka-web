@@ -135,7 +135,7 @@ add_action('admin_post_pp_export_subscribers', function () {
     }
     check_admin_referer('pp_export_subscribers');
     if (!function_exists('zcn_table')) {
-        wp_die('Newsletter nie je aktívny.', 400);
+        wp_die('VIP nie je aktívny.', 400);
     }
 
     global $wpdb;
@@ -330,6 +330,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .prop-item-img{height:190px;background:var(--section);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:28px;overflow:hidden;position:relative;flex-shrink:0}
 .prop-item-img img{width:100%;height:100%;object-fit:cover}
 .prop-item-badge{position:absolute;bottom:10px;left:10px;background:var(--accent);color:var(--dark);font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:50px}
+.prop-item-publish-state{position:absolute;top:10px;right:10px;z-index:3;background:#fff7ed;color:#9a3412;border:1px solid #fdba74;border-radius:50px;padding:5px 10px;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;box-shadow:0 3px 12px rgba(154,52,18,.18)}
 .prop-item-body{padding:15px 16px;display:flex;flex-direction:column;flex:1}
 .prop-item-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--dark);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prop-item-price{font-size:17px;font-weight:800;color:var(--accent-txt);font-family:var(--sans);font-variant-numeric:tabular-nums;margin-bottom:10px}
@@ -350,9 +351,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pnl-list-tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px}
 .pnl-list-tools label{display:flex;flex-direction:column;gap:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
 .pnl-list-tools input,.pnl-list-tools select{min-height:38px;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font:13px var(--sans);color:var(--text)}
+.pnl-status option,.pnl-status optgroup{color:#2C2C2C!important;background:#fff!important}
 .pnl-view-toggle{display:flex;gap:4px;margin-left:auto}
 .pnl-view-toggle button{min-height:38px;padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;background:var(--section);font:700 12px var(--sans);cursor:pointer;color:var(--muted)}
 .pnl-view-toggle button.active{background:var(--dark);border-color:var(--dark);color:#fff}
+.pp-options-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}.pp-options-head h1{font-family:var(--serif);font-size:26px;color:var(--dark)}.pp-options-head p{margin-top:4px;color:var(--muted);font-size:13px}.pp-options-tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px}.pp-options-tabs a{flex:0 0 auto;padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none}.pp-options-tabs a.active{background:var(--dark);border-color:var(--dark);color:#fff}.pp-options-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--sh)}.pp-options-card h2{font-family:var(--serif);font-size:20px;color:var(--dark)}.pp-options-help{color:var(--muted);font-size:13px;line-height:1.6;margin:5px 0 18px}.pp-options-list{display:flex;flex-direction:column;gap:9px}.pp-option-row{display:grid;grid-template-columns:28px minmax(170px,1fr) minmax(170px,1fr) minmax(210px,1.15fr) auto 90px;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff}.pp-option-row.dragging{opacity:.4}.pp-option-row>label,.pp-option-new>label{display:flex;flex-direction:column;gap:5px}.pp-option-row small,.pp-option-new small{display:block;font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}.pp-option-row input[type=text],.pp-option-new input[type=text]{width:100%;min-height:40px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font:14px var(--sans)}.pp-option-row input[type=text]:focus,.pp-option-new input[type=text]:focus{outline:none;border-color:var(--accent)}.pp-option-move{font-size:21px;color:var(--muted);cursor:grab;text-align:center}.pp-option-hide{display:flex!important;flex-direction:row!important;align-items:center;white-space:nowrap;font-size:12px;color:var(--muted)}.pp-option-hide input{width:17px;height:17px;accent-color:var(--accent)}.pp-option-used{text-align:right;color:var(--muted);font-size:11px}.pp-color-presets{display:flex;gap:6px;flex-wrap:wrap}.pp-color-presets label{cursor:pointer}.pp-color-presets input{position:absolute;opacity:0;pointer-events:none}.pp-color-presets span{display:block;width:25px;height:25px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border)}.pp-color-presets input:checked+span{box-shadow:0 0 0 3px var(--dark);transform:scale(.92)}.pp-option-new{display:grid;grid-template-columns:minmax(200px,1fr) minmax(170px,1fr) minmax(210px,1.15fr);gap:12px;margin-top:16px;padding:16px;border:1.5px dashed var(--accent);border-radius:10px;background:var(--section)}.pp-options-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.pp-options-notice{padding:12px 15px;border-radius:9px;margin-bottom:14px;font-size:13px}.pp-options-notice.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}.pp-options-notice.bad{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 14px;border-radius:var(--r-sm);font-size:11px;font-weight:700;border:none;cursor:pointer;text-decoration:none;font-family:var(--sans);letter-spacing:.3px;transition:all .2s}
 .btn-primary{background:var(--accent);color:var(--dark)}
 .btn-primary:hover{background:var(--accent-dk)}
@@ -660,6 +663,7 @@ a.pnl-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,50,30,
     .pnl-subs-table td form{max-width:100%}
     .pnl-subs-table td select{max-width:100%!important;min-height:40px;font-size:16px!important}
     .pnl-subs-table td button{min-height:40px}
+    .pp-options-card{padding:14px}.pp-option-row{grid-template-columns:24px minmax(0,1fr);gap:9px}.pp-option-row>*:not(.pp-option-move){grid-column:2}.pp-option-used{text-align:left}.pp-option-new{grid-template-columns:1fr}.pp-options-actions .btn{width:100%;min-height:44px}.pp-color-presets span{width:30px;height:30px}.pp-option-row{cursor:default}.pp-option-move{display:none}
 }
 @media(max-width:520px){
     .pnl-subscriber-filters{grid-template-columns:1fr}
@@ -681,7 +685,7 @@ a.pnl-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,50,30,
         <a href="?action=add" class="<?php echo ($action==='add'||$action==='edit')?'active':'' ?>">+ Nová ponuka</a>
         <a href="?action=leads" class="<?php echo $action==='leads'?'active':'' ?>">Formuláre<?php if ($lead_cnt): ?> <span class="ph-badge"><?php echo $lead_cnt ?></span><?php endif; ?></a>
         <?php if (function_exists('zcn_table')): ?>
-        <a href="?action=newsletter" class="<?php echo $action==='newsletter'?'active':'' ?>">Newsletter</a>
+        <a href="?action=newsletter" class="<?php echo $action==='newsletter'?'active':'' ?>">VIP</a>
         <?php endif; ?>
         <?php if (function_exists('zcr_table')): ?>
         <a href="?action=reviews" class="<?php echo $action==='reviews'?'active':'' ?>">Recenzie</a>
@@ -692,6 +696,7 @@ a.pnl-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,50,30,
         <?php if (function_exists('panel_security')): ?>
         <a href="?action=zabezpecenie" class="<?php echo $action==='zabezpecenie'?'active':'' ?>">Zabezpečenie</a>
         <?php endif; ?>
+        <a href="?action=options" class="<?php echo $action==='options'?'active':'' ?>">Položky ponúk</a>
         <a href="?action=import" class="<?php echo $action==='import'?'active':'' ?>">Import/Export</a>
         <?php if (current_user_can('manage_options')): ?>
         <a href="?action=settings" class="<?php echo $action==='settings'?'active':'' ?>">Nastavenia</a>
@@ -708,11 +713,11 @@ a.pnl-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,50,30,
 </div>
 
 <div class="pc<?php echo $action==='home'?' pc--home':'' ?>">
-    <?php if(isset($_GET['saved'])): $saved_pid = intval($_GET['pid'] ?? 0); ?>
+    <?php if(isset($_GET['saved'])): $saved_pid = intval($_GET['pid'] ?? 0); $saved_is_draft = $saved_pid && get_post_status($saved_pid)!=='publish'; ?>
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:12px 16px;border-radius:var(--r-sm);margin-bottom:20px;font-size:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <span>Nehnuteľnosť uložená!</span>
-        <?php if ($saved_pid && function_exists('zcn_handle_property_blast')): ?>
-        <button class="btn btn-primary" onclick="pnlBlast(<?php echo $saved_pid ?>, this)">Poslať odberateľom newslettera</button>
+        <span><?php echo $saved_is_draft ? 'Koncept ponuky bol uložený. Na webe zatiaľ nie je viditeľný.' : 'Nehnuteľnosť bola uložená a je zverejnená.' ?></span>
+        <?php if ($saved_pid && !$saved_is_draft && function_exists('zcn_handle_property_blast')): ?>
+        <button class="btn btn-primary" onclick="pnlBlast(<?php echo $saved_pid ?>, this)">Poslať VIP odberateľom</button>
         <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -720,6 +725,7 @@ a.pnl-stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,50,30,
     if ($action==='add'||$action==='edit') panel_form($pid);
     elseif ($action==='sitekit') panel_sitekit();
     elseif ($action==='list') panel_list();
+    elseif ($action==='options' && function_exists('panel_property_options')) panel_property_options();
     elseif ($action==='leads') echo panel_leads();
     elseif ($action==='import') echo panel_import_export();
     elseif ($action==='settings' && current_user_can('manage_options')) echo panel_settings();
@@ -764,6 +770,48 @@ function showTab(name,btn){
         },40);
     }
 }
+function ppSyncStatusLabels(){
+    var type=document.getElementById('ppPropertyType'),status=document.getElementById('ppPropertyStatus');
+    if(!type||!status)return;
+    var selectedType=type.options[type.selectedIndex];
+    var rental=selectedType&&selectedType.dataset.rental==='1';
+    Array.prototype.forEach.call(status.options,function(option){
+        if(!option.value)return;
+        option.textContent=(rental?option.dataset.rentalLabel:option.dataset.saleLabel)||option.textContent;
+    });
+}
+document.addEventListener('DOMContentLoaded',function(){
+    var type=document.getElementById('ppPropertyType');
+    if(type){type.addEventListener('change',ppSyncStatusLabels);ppSyncStatusLabels();}
+    var publication=document.getElementById('ppPublicationStatus'),save=document.getElementById('ppSaveProperty');
+    function syncSaveLabel(){
+        if(!publication||!save)return;
+        var editing=save.dataset.editing==='1';
+        save.textContent=publication.value==='draft'?(editing?'Uložiť ako koncept':'Vytvoriť koncept'):(editing?'Uložiť a zverejniť':'Zverejniť ponuku');
+    }
+    if(publication){publication.addEventListener('change',syncSaveLabel);syncSaveLabel();}
+    var slug=document.getElementById('pp-property-slug');
+    var reset=document.getElementById('ppResetSlug');
+    var resetFlag=document.getElementById('ppResetSlugFlag');
+    var slugHelp=document.getElementById('pp-property-slug-help');
+    if(slug&&reset&&resetFlag&&slugHelp){
+        reset.addEventListener('click',function(){
+            resetFlag.value='1';
+            slug.value='';
+            reset.textContent='Slug sa obnoví po uložení';
+            slugHelp.textContent='Po uložení sa slug vytvorí z názvu a znova sa bude meniť automaticky.';
+        });
+        slug.addEventListener('input',function(){
+            if(slug.value.trim()!==''){
+                resetFlag.value='0';
+                reset.textContent='Obnoviť slug';
+            }
+            slugHelp.textContent=resetFlag.value==='1'
+                ? 'Po uložení sa slug obnoví podľa názvu.'
+                : 'Vlastný slug má prednosť pred názvom. Automatiku obnovíš tlačidlom dole.';
+        });
+    }
+});
 function ppEditorLineHeight(editorId,value,select){
     if(!value)return;
     var editor=window.tinymce&&tinymce.get(editorId)&&!tinymce.get(editorId).isHidden()?tinymce.get(editorId):null;
@@ -970,7 +1018,9 @@ function delProp(id, nonce){
 function pnlStatus(id, sel){
     var val=sel.value;
     var item=sel.closest('.prop-item');if(item)item.dataset.status=val||'active';
-    sel.style.background = val==='predane'?'#f1f5f9':(val==='rezervovane'?'#fffbeb':'#f0fdf4');
+    var opt=sel.options[sel.selectedIndex];
+    sel.style.background=opt&&opt.dataset.bg?opt.dataset.bg:'#f0fdf4';
+    sel.style.color=opt&&opt.dataset.fg?opt.dataset.fg:'#166534';
     var data=new FormData();
     data.append('action','pp_quick_status');
     data.append('nonce','<?php echo wp_create_nonce('pp_quick_status') ?>');
@@ -1107,13 +1157,14 @@ function pnlBlastRun(id, btn, extra){
 // ── ÚVOD (dashboard) ───────────────────────────────────────────────────────
 function panel_home() {
     $user  = wp_get_current_user();
-    $props = get_posts(['post_type'=>'property','posts_per_page'=>-1,'orderby'=>'date','order'=>'DESC']);
-    $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+    $props = get_posts(['post_type'=>'property','posts_per_page'=>-1,'post_status'=>['publish','draft'],'orderby'=>'date','order'=>'DESC']);
+    $typ_labels = function_exists('pp_property_types') ? pp_property_types() : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
 
-    $st_active=0;$st_rez=0;$st_sold=0;$views_total=0;
+    $st_active=0;$st_draft=0;$status_counts=[];$views_total=0;
     foreach($props as $pp){
+        if ($pp->post_status === 'draft') { $st_draft++; continue; }
         $sp=get_post_meta($pp->ID,'_property_stav_predaja',true);
-        if($sp==='predane')$st_sold++;elseif($sp==='rezervovane')$st_rez++;else $st_active++;
+        if($sp==='') $st_active++; else $status_counts[$sp]=($status_counts[$sp]??0)+1;
         $views_total+=(int)get_post_meta($pp->ID,'_property_views',true);
     }
     $lead_cnt = (int) wp_count_posts('pp_lead')->publish;
@@ -1139,10 +1190,14 @@ function panel_home() {
         <?php
         $cards = [
             ['Aktívne ponuky', $st_active, '#16a34a', 'home', '?action=list'],
-            ['Rezervované',     $st_rez,    '#C6902B', 'clock', '?action=list'],
-            ['Predané',         $st_sold,   '#746A62', 'star', '?action=list'],
-            ['Zobrazenia spolu',$views_total,'#7C5E33','chart', ''],
+            ['Koncepty', $st_draft, '#C2410C', 'pen', '?action=list'],
         ];
+        foreach (pp_catalog_rows('statuses') as $status_row) {
+            $preset = pp_badge_preset($status_row['color']);
+            $label = $status_row['value']==='predane' ? 'Predané / prenajaté' : $status_row['label'];
+            $cards[] = [$label, (int)($status_counts[$status_row['value']]??0), $preset['fg']==='#FFFFFF'?'#7C5E33':'#C6902B', 'star', '?action=list'];
+        }
+        $cards[] = ['Zobrazenia spolu',$views_total,'#7C5E33','chart', ''];
         if (function_exists('panel_leads')) $cards[] = ['Nové správy', $lead_new, '#4338CA', 'megaphone', '?action=leads'];
         foreach ($cards as [$l,$n,$c,$ic,$href]):
             $tag = $href ? 'a' : 'div'; ?>
@@ -1158,8 +1213,9 @@ function panel_home() {
     <div class="pnl-quick">
         <a href="?action=add" class="pnl-quick-btn"><?php echo pp_svg('home',18) ?> Pridať ponuku</a>
         <a href="?action=list" class="pnl-quick-btn"><?php echo pp_svg('building',18) ?> Všetky ponuky</a>
+        <a href="?action=options" class="pnl-quick-btn"><?php echo pp_svg('pen',18) ?> Položky a štítky</a>
         <a href="?action=leads" class="pnl-quick-btn"><?php echo pp_svg('megaphone',18) ?> Formuláre<?php if($lead_new):?> (<?php echo $lead_new ?>)<?php endif; ?></a>
-        <?php if (function_exists('zcn_table')): ?><a href="?action=newsletter" class="pnl-quick-btn"><?php echo pp_svg('email',18) ?> Newsletter</a><?php endif; ?>
+        <?php if (function_exists('zcn_table')): ?><a href="?action=newsletter" class="pnl-quick-btn"><?php echo pp_svg('email',18) ?> VIP</a><?php endif; ?>
         <?php if (function_exists('zcr_table')): ?><a href="?action=reviews&new_review=1" class="pnl-quick-btn"><?php echo pp_svg('star',18) ?> Pridať recenziu</a><?php endif; ?>
         <a href="?action=sitekit" class="pnl-quick-btn"><?php echo pp_svg('chart',18) ?> Google štatistiky</a>
         <a href="?action=import" class="pnl-quick-btn"><?php echo pp_svg('chart',18) ?> Import/Export</a>
@@ -1186,7 +1242,15 @@ function panel_home() {
                     $typ = get_post_meta($p->ID,'_property_typ',true);
                     $sp  = get_post_meta($p->ID,'_property_stav_predaja',true);
                     if ($cena && strpos($cena,'€')===false) $cena.=' €';
-                    $badge = $sp==='predane'?['Predané','#746A62']:($sp==='rezervovane'?['Rezervované','#C6902B']:[$typ_labels[$typ]??'Aktívna','#16a34a']);
+                    if ($p->post_status === 'draft') {
+                        $badge = ['Koncept', '#FFF7ED', '#9A3412'];
+                    } elseif ($sp) {
+                        $b = pp_sale_badge($sp, $typ);
+                        $badge = [$b['label'] ?? pp_sale_label($sp,$typ), $b['bg'] ?? '#746A62', $b['fg'] ?? '#fff'];
+                    } else {
+                        $tb = function_exists('pp_property_type_badge') ? pp_property_type_badge($typ) : null;
+                        $badge = [$typ_labels[$typ]??'Aktívna', $tb['bg']??'#16a34a', $tb['fg']??'#fff'];
+                    }
                 ?>
                 <a href="?action=edit&id=<?php echo $p->ID ?>" class="pnl-recent-item">
                     <div class="pnl-recent-img"><?php echo $cid ? wp_get_attachment_image($cid,'thumbnail') : '<span class="pnl-recent-noimg">'.pp_svg('home',22).'</span>' ?></div>
@@ -1194,7 +1258,7 @@ function panel_home() {
                         <div class="pnl-recent-title"><?php echo esc_html($p->post_title) ?></div>
                         <div class="pnl-recent-price"><?php echo esc_html($cena ?: 'Cena dohodou') ?></div>
                     </div>
-                    <span class="pnl-recent-badge" style="background:<?php echo $badge[1] ?>"><?php echo esc_html($badge[0]) ?></span>
+                    <span class="pnl-recent-badge" style="background:<?php echo esc_attr($badge[1]) ?>;color:<?php echo esc_attr($badge[2]) ?>"><?php echo esc_html($badge[0]) ?></span>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -1265,7 +1329,7 @@ function panel_sitekit() {
 
 function panel_list() {
     $props = get_posts(pp_property_order_args(['post_type'=>'property','posts_per_page'=>-1,'post_status'=>'any']));
-    $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+    $typ_labels = function_exists('pp_property_types') ? pp_property_types() : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
     $cities = [];
     foreach ($props as $prop) {
         $city = trim((string) get_post_meta($prop->ID, '_property_mesto', true));
@@ -1296,8 +1360,9 @@ function panel_list() {
             <select id="pnlPropStatus">
                 <option value="">Všetky</option>
                 <option value="active">Aktívne</option>
-                <option value="rezervovane">Rezervované</option>
-                <option value="predane">Predané</option>
+                <?php foreach (pp_catalog_rows('statuses') as $row): ?>
+                <option value="<?php echo esc_attr($row['value']) ?>"><?php echo esc_html($row['value']==='predane'?'Predané / prenajaté':$row['label']) ?></option>
+                <?php endforeach; ?>
             </select>
         </label>
         <label>Typ
@@ -1306,6 +1371,13 @@ function panel_list() {
                 <?php foreach ($typ_labels as $value => $label): ?>
                 <option value="<?php echo esc_attr($value) ?>"><?php echo esc_html($label) ?></option>
                 <?php endforeach; ?>
+            </select>
+        </label>
+        <label>Publikovanie
+            <select id="pnlPropPublication">
+                <option value="">Všetky</option>
+                <option value="publish">Zverejnené</option>
+                <option value="draft">Koncepty</option>
             </select>
         </label>
         <?php if ($cities): ?>
@@ -1328,8 +1400,9 @@ function panel_list() {
         <strong id="pnlBulkCount" style="font-size:13px">0 označených</strong>
         <span style="opacity:.5">|</span>
         <button class="btn btn-ghost" style="background:rgba(255,255,255,.12);color:#fff;border-color:transparent" onclick="pnlBulk('')">Aktívne</button>
-        <button class="btn btn-ghost" style="background:rgba(255,255,255,.12);color:#fff;border-color:transparent" onclick="pnlBulk('rezervovane')">Rezervované</button>
-        <button class="btn btn-ghost" style="background:rgba(255,255,255,.12);color:#fff;border-color:transparent" onclick="pnlBulk('predane')">Predané</button>
+        <?php foreach (pp_catalog_rows('statuses') as $row): ?>
+        <button class="btn btn-ghost" style="background:rgba(255,255,255,.12);color:#fff;border-color:transparent" onclick="pnlBulk('<?php echo esc_js($row['value']) ?>')"><?php echo esc_html($row['value']==='predane'?'Predané / prenajaté':$row['label']) ?></button>
+        <?php endforeach; ?>
         <button class="btn btn-danger" onclick="pnlBulk('delete')">Zmazať označené</button>
         <button class="btn btn-ghost" style="background:transparent;color:rgba(255,255,255,.7);border-color:transparent;margin-left:auto" onclick="pnlBulkClear()">Zrušiť výber</button>
     </div>
@@ -1350,6 +1423,7 @@ function panel_list() {
              data-type="<?php echo esc_attr($typ) ?>"
              data-city="<?php echo esc_attr($city) ?>"
              data-status="<?php echo esc_attr($sp ?: 'active') ?>"
+             data-publication="<?php echo esc_attr($p->post_status) ?>"
              style="position:relative">
             <div class="prop-drag" title="Potiahnuť a zmeniť poradie" aria-label="Potiahnuť a zmeniť poradie" role="button">⋮⋮</div>
             <div class="prop-mobile-order" aria-label="Zmeniť poradie ponuky">
@@ -1361,26 +1435,29 @@ function panel_list() {
             </label>
             <div class="prop-item-img">
                 <?php if($cid) echo wp_get_attachment_image($cid,'medium'); else echo ''; ?>
-                <?php if($typ): ?><span class="prop-item-badge"><?php echo $typ_labels[$typ]??$typ ?></span><?php endif; ?>
+                <?php if($typ): $tb=pp_property_type_badge($typ); ?><span class="prop-item-badge" style="background:<?php echo esc_attr($tb['bg']??'#B8A47A') ?>;color:<?php echo esc_attr($tb['fg']??'#1C1A18') ?>"><?php echo esc_html($typ_labels[$typ]??$typ) ?></span><?php endif; ?>
+                <?php if($p->post_status!=='publish'): ?><span class="prop-item-publish-state">Koncept</span><?php endif; ?>
             </div>
             <div class="prop-item-body">
                 <div class="prop-item-title"><?php echo esc_html($p->post_title) ?></div>
                 <div class="prop-item-price"<?php if(!$cena) echo ' style="color:var(--muted);font-size:13px;font-weight:600"'; ?>><?php echo esc_html($cena ?: 'Cena dohodou') ?></div>
+                <?php $sb=$sp?pp_sale_badge($sp,$typ):null; ?>
                 <select class="pnl-status" onchange="pnlStatus(<?php echo $p->ID ?>,this)" title="Rýchlo zmeniť stav"
-                    style="margin-bottom:8px;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--sans);background:<?php echo $sp==='predane'?'#f1f5f9':($sp==='rezervovane'?'#fffbeb':'#f0fdf4') ?>">
-                    <option value="" <?php selected($sp,'') ?>>● Aktívna</option>
-                    <option value="rezervovane" <?php selected($sp,'rezervovane') ?>>● Rezervované</option>
-                    <option value="predane" <?php selected($sp,'predane') ?>>● Predané</option>
+                    style="margin-bottom:8px;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--sans);background:<?php echo esc_attr($sb['bg']??'#f0fdf4') ?>;color:<?php echo esc_attr($sb['fg']??'#166534') ?>">
+                    <option value="" data-bg="#f0fdf4" data-fg="#166534" <?php selected($sp,'') ?>>Aktívna</option>
+                    <?php foreach (pp_catalog_rows('statuses') as $row): if(!empty($row['hidden'])&&$row['value']!==$sp)continue; $preset=pp_badge_preset($row['color']); ?>
+                    <option value="<?php echo esc_attr($row['value']) ?>" data-bg="<?php echo esc_attr($preset['bg']) ?>" data-fg="<?php echo esc_attr($preset['fg']) ?>" <?php selected($sp,$row['value']) ?>><?php echo esc_html(pp_sale_label($row['value'],$typ)) ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <div class="prop-item-actions">
                     <a href="?action=edit&id=<?php echo $p->ID ?>" class="btn btn-primary">Upraviť</a>
-                    <a href="<?php echo get_permalink($p->ID) ?>" target="_blank" class="btn btn-ghost">Zobraziť</a>
+                    <a href="<?php echo esc_url($p->post_status==='publish' ? get_permalink($p->ID) : get_preview_post_link($p)) ?>" target="_blank" class="btn btn-ghost"><?php echo $p->post_status==='publish'?'Zobraziť':'Náhľad' ?></a>
                     <a href="?action=duplicate&id=<?php echo $p->ID ?>&_wpnonce=<?php echo wp_create_nonce('panel_dup_'.$p->ID) ?>" class="btn btn-ghost">Duplikovať</a>
-                    <?php if (function_exists('zcn_handle_property_blast')):
+                    <?php if ($p->post_status==='publish' && function_exists('zcn_handle_property_blast')):
                         $blast_sent = get_post_meta($p->ID, '_zcn_blast_sent', true); ?>
                     <button class="btn btn-success" onclick="pnlBlast(<?php echo $p->ID ?>, this)"
-                        title="<?php echo $blast_sent ? 'Odoslané '.esc_attr(date('d.m.Y H:i', strtotime($blast_sent))).' – kliknutím pošleš znova' : 'Poslať ponuku odberateľom newslettera' ?>">
-                        Newsletter<?php echo $blast_sent ? ' ✓' : '' ?>
+                        title="<?php echo $blast_sent ? 'Odoslané '.esc_attr(date('d.m.Y H:i', strtotime($blast_sent))).' – kliknutím pošleš znova' : 'Poslať ponuku VIP odberateľom' ?>">
+                        VIP<?php echo $blast_sent ? ' ✓' : '' ?>
                     </button>
                     <?php endif; ?>
                     <button class="btn btn-danger" onclick="delProp(<?php echo $p->ID ?>, '<?php echo wp_create_nonce('panel_delete_'.$p->ID) ?>')">Zmazať</button>
@@ -1395,7 +1472,7 @@ function panel_list() {
     var pnlOrderNonce='<?php echo wp_create_nonce('pp_reorder') ?>';
     var pnlList=document.getElementById('pnlPropList'),pnlDragged=null;
     function pnlFiltersActive(){
-        return ['pnlPropSearch','pnlPropStatus','pnlPropType','pnlPropCity'].some(function(id){var el=document.getElementById(id);return el&&el.value});
+        return ['pnlPropSearch','pnlPropStatus','pnlPropType','pnlPropPublication','pnlPropCity'].some(function(id){var el=document.getElementById(id);return el&&el.value});
     }
     function pnlSetView(view){
         view=view==='rows'?'rows':'cards';
@@ -1414,17 +1491,18 @@ function panel_list() {
         var search=(document.getElementById('pnlPropSearch').value||'').toLocaleLowerCase();
         var status=document.getElementById('pnlPropStatus').value;
         var type=document.getElementById('pnlPropType').value;
+        var publication=document.getElementById('pnlPropPublication').value;
         var city=document.getElementById('pnlPropCity')?document.getElementById('pnlPropCity').value:'';
         var shown=0;
         pnlList.querySelectorAll('.prop-item').forEach(function(item){
-            var ok=(!search||item.dataset.title.indexOf(search)>-1)&&(!status||item.dataset.status===status)&&(!type||item.dataset.type===type)&&(!city||item.dataset.city===city);
+            var ok=(!search||item.dataset.title.indexOf(search)>-1)&&(!status||item.dataset.status===status)&&(!type||item.dataset.type===type)&&(!publication||item.dataset.publication===publication)&&(!city||item.dataset.city===city);
             item.hidden=!ok;if(ok)shown++;
         });
         document.getElementById('pnlPropShown').textContent=shown+' zobrazených';
         var hint=document.getElementById('pnlOrderHint');
         if(hint&&pnlList.classList.contains('is-rows')) hint.textContent=pnlFiltersActive()?'Pre zmenu poradia najprv zrušte filtre.':'Potiahnite riadok za bodky. Toto poradie sa použije aj v oknách a na verejných stránkach.';
     }
-    ['pnlPropSearch','pnlPropStatus','pnlPropType','pnlPropCity'].forEach(function(id){
+    ['pnlPropSearch','pnlPropStatus','pnlPropType','pnlPropPublication','pnlPropCity'].forEach(function(id){
         var el=document.getElementById(id);if(el)el.addEventListener(id==='pnlPropSearch'?'input':'change',pnlApplyFilters);
     });
     pnlList.addEventListener('dragstart',function(e){
@@ -1516,23 +1594,33 @@ function panel_form($pid) {
 
         <div id="pftab_basic" class="pf-panel active">
             <div class="ff"><label>Názov nehnuteľnosti *</label><input type="text" name="title" value="<?php echo esc_attr($post ? $post->post_title : '') ?>" required></div>
+            <div class="ff">
+                <label for="pp-property-slug">Koncovka odkazu (slug)</label>
+                <input type="text" id="pp-property-slug" name="property_slug" value="<?php echo esc_attr($post ? rawurldecode($post->post_name) : '') ?>" placeholder="napr. predaj-2-izbovy-byt-zvolen" aria-describedby="pp-property-slug-help">
+                <small id="pp-property-slug-help" aria-live="polite"><?php echo $pid && get_post_meta($pid, '_pp_manual_slug', true) ? 'Ručný slug. Zmena názvu ho neprepíše.' : 'Automatický slug podľa názvu. Prepísaním poľa nastavíš vlastný slug.' ?></small>
+                <input type="hidden" name="reset_property_slug" id="ppResetSlugFlag" value="0">
+            </div>
             <div class="ff-row">
                 <div class="ff"><label>Typ ponuky</label>
-                    <select name="typ">
+                    <select name="typ" id="ppPropertyType">
                         <option value="">Vyber...</option>
-                        <option value="predaj" <?php selected($f('typ'),'predaj') ?>>Na predaj</option>
-                        <option value="prenajom" <?php selected($f('typ'),'prenajom') ?>>Na prenájom</option>
-                        <option value="pozemok" <?php selected($f('typ'),'pozemok') ?>>Pozemok</option>
+                        <?php foreach (pp_catalog_rows('types') as $row): if(!empty($row['hidden'])&&$row['value']!==$f('typ'))continue; ?><option value="<?php echo esc_attr($row['value']) ?>" data-rental="<?php echo !empty($row['rental'])?'1':'0' ?>" <?php selected($f('typ'),$row['value']) ?>><?php echo esc_html($row['label']) ?></option><?php endforeach; ?>
                     </select>
                 </div>
                 <div class="ff"><label>Cena (bez €, doplní sa auto)</label><input type="text" name="cena" value="<?php echo esc_attr(str_replace(' €','',$f('cena'))) ?>" placeholder="184 900"></div>
             </div>
-            <div class="ff-row">
+            <div class="ff-row-3">
                 <div class="ff"><label>Stav ponuky</label>
-                    <select name="stav_predaja">
+                    <select name="stav_predaja" id="ppPropertyStatus">
                         <option value="">Aktívna</option>
-                        <option value="rezervovane" <?php selected($f('stav_predaja'),'rezervovane') ?>>Rezervované</option>
-                        <option value="predane" <?php selected($f('stav_predaja'),'predane') ?>>Predané</option>
+                        <?php foreach (pp_catalog_rows('statuses') as $row): if(!empty($row['hidden'])&&$row['value']!==$f('stav_predaja'))continue; ?><option value="<?php echo esc_attr($row['value']) ?>" data-sale-label="<?php echo esc_attr($row['label']) ?>" data-rental-label="<?php echo esc_attr($row['rental_label']??$row['label']) ?>" <?php selected($f('stav_predaja'),$row['value']) ?>><?php echo esc_html(pp_sale_label($row['value'],$f('typ'))) ?></option><?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="ff"><label>Viditeľnosť ponuky</label>
+                    <?php $publication_status = $post ? $post->post_status : 'publish'; ?>
+                    <select name="post_status" id="ppPublicationStatus">
+                        <option value="draft" <?php selected($publication_status,'draft') ?>>Koncept – iba v paneli</option>
+                        <option value="publish" <?php selected($publication_status,'publish') ?>>Zverejnená – viditeľná na webe</option>
                     </select>
                 </div>
                 <div class="ff"><label>Pôvodná cena (pre „Znížená cena", voliteľné)</label><input type="text" name="cena_povodna" value="<?php echo esc_attr(str_replace(' €','',$f('cena_povodna'))) ?>" placeholder="199 000"></div>
@@ -1548,7 +1636,7 @@ function panel_form($pid) {
             </div>
             <div class="ff">
                 <label for="zcpp_short">Krátky popis</label>
-                <small style="color:var(--muted);font-size:12px;line-height:1.5">Stručné predstavenie ponuky. Používa sa v SEO a newsletteri; odporúčaná dĺžka je približne 30–60 slov.</small>
+                <small style="color:var(--muted);font-size:12px;line-height:1.5">Stručné predstavenie ponuky. Používa sa v SEO a vo VIP e-mailoch; odporúčaná dĺžka je približne 30–60 slov.</small>
                 <?php wp_editor(
                     $f('popis_kratky'),
                     'zcpp_short',
@@ -1771,7 +1859,8 @@ function panel_form($pid) {
         </div>
         <div class="pf-footer">
             <a href="?action=list" class="btn btn-ghost">Zrušiť</a>
-            <button type="submit" class="btn btn-primary" style="padding:12px 28px;font-size:13px"><?php echo $pid?'Uložiť zmeny':'Vytvoriť ponuku' ?></button>
+            <button type="button" class="btn btn-ghost" id="ppResetSlug">Obnoviť slug</button>
+            <button type="submit" class="btn btn-primary" id="ppSaveProperty" data-editing="<?php echo $pid?'1':'0' ?>" style="padding:12px 28px;font-size:13px"><?php echo $pid?'Uložiť zmeny':'Vytvoriť ponuku' ?></button>
         </div>
         </form>
     </div>
@@ -1841,12 +1930,51 @@ add_action('template_redirect', function() {
         }
     }
     $is_new = !$pid;
-    $data = ['post_title'=>sanitize_text_field($_POST['title']),'post_content'=>wp_kses_post(wp_unslash($_POST['content']??'')),'post_type'=>'property','post_status'=>'publish'];
-    if ($pid){$data['ID']=$pid;wp_update_post($data);}else{$pid=wp_insert_post($data);}
+    $requested_status = sanitize_key(wp_unslash($_POST['post_status'] ?? 'publish'));
+    if (!in_array($requested_status, ['draft','publish'], true)) $requested_status = 'draft';
+    if ($requested_status === 'publish' && !current_user_can('publish_posts')) $requested_status = 'draft';
+    $data = [
+        'post_title'   => sanitize_text_field(wp_unslash($_POST['title'])),
+        'post_content' => wp_kses_post(wp_unslash($_POST['content']??'')),
+        'post_type'    => 'property',
+        'post_status'  => $requested_status,
+    ];
+    $slug_input = $_POST['property_slug'] ?? '';
+    $manual_slug = $pid && get_post_meta($pid, '_pp_manual_slug', true);
+    $old_slug = $pid ? $existing->post_name : '';
+    $reset_slug = ($_POST['reset_property_slug'] ?? '') === '1';
+    if (!$reset_slug && is_string($slug_input) && trim($slug_input) !== '') {
+        $submitted_slug = sanitize_title(wp_unslash($slug_input));
+        if ($submitted_slug === '') {
+            wp_die('Koncovka odkazu musí obsahovať písmená alebo čísla.', 'Neplatná koncovka odkazu', ['response' => 400, 'back_link' => true]);
+        }
+        if ($submitted_slug !== $old_slug) {
+            $data['post_name'] = $submitted_slug;
+            $data['meta_input']['_pp_manual_slug'] = '1';
+            $manual_slug = true;
+        }
+    }
+    if ($reset_slug || (!$manual_slug && (!$pid || $old_slug === '' || $data['post_title'] !== $existing->post_title))) {
+        $data['post_name'] = sanitize_title($data['post_title']);
+    }
+    if ($reset_slug) {
+        $data['meta_input']['_pp_manual_slug'] = '0';
+    }
+    if ($pid) {
+        $data['ID']=$pid;
+        $saved_post = wp_update_post($data, true);
+    } else {
+        $saved_post = wp_insert_post($data, true);
+    }
+    if (is_wp_error($saved_post) || !$saved_post) {
+        $message = is_wp_error($saved_post) ? $saved_post->get_error_message() : 'Ponuku sa nepodarilo uložiť.';
+        wp_die(esc_html($message), 'Chyba pri ukladaní', ['response'=>500, 'back_link'=>true]);
+    }
+    $pid = (int) $saved_post;
     if ($is_new && $pid && !is_wp_error($pid) && get_post_meta($pid, '_property_sort_order', true) === '') {
         update_post_meta($pid, '_property_sort_order', pp_next_property_order());
     }
-    if (function_exists('pp_log')) pp_log($is_new ? 'Vytvorená ponuka' : 'Upravená ponuka', $pid);
+    if (function_exists('pp_log')) pp_log(($is_new ? 'Vytvorená' : 'Upravená') . ($requested_status==='draft' ? ' ponuka ako koncept' : ' zverejnená ponuka'), $pid);
     foreach(['typ','cena','cena_povodna','lokalita','mesto','okres','plocha','pozemok','spalne','kupelne','wc','poschodie','rocnik','stav','vlastnictvo','stav_predaja','energie','poznamka'] as $f) {
         if (isset($_POST[$f])) {
             $val = sanitize_text_field($_POST[$f]);
@@ -1883,17 +2011,136 @@ function pp_parse_subscriber_batch($raw, $limit = 500) {
     return ['contacts' => [], 'invalid_rows' => [], 'duplicate_rows' => 0, 'truncated' => false];
 }
 
+/*
+ * VIP kontakty sa nesmú ukladať až pri vykresľovaní shortcodu. WordPress
+ * môže frontendový POST predtým kanonicky presmerovať alebo ho môže zachytiť
+ * cache. Samostatný admin-post endpoint je stabilný pre jedného človeka,
+ * dávku aj akcie v tabuľke a funguje aj roli realitného makléra.
+ */
+define('PP_VIP_PANEL_ACTION', 'pp_vip_panel');
+
+function pp_vip_panel_notice_set($message, $ok = false) {
+    set_transient('pp_vip_notice_' . get_current_user_id(), [
+        'message' => sanitize_text_field((string) $message),
+        'ok'      => (bool) $ok,
+    ], MINUTE_IN_SECONDS);
+}
+
+function pp_vip_panel_notice_take() {
+    $key = 'pp_vip_notice_' . get_current_user_id();
+    $notice = get_transient($key);
+    delete_transient($key);
+    return is_array($notice) ? $notice : [];
+}
+
+function pp_vip_panel_form_fields($operation) {
+    wp_nonce_field('pp_vip_panel', '_ppvipnonce');
+    echo '<input type="hidden" name="action" value="' . esc_attr(PP_VIP_PANEL_ACTION) . '">';
+    echo '<input type="hidden" name="vip_operation" value="' . esc_attr($operation) . '">';
+}
+
+function pp_vip_panel_post_endpoint() {
+    if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+        wp_die('Nemáte oprávnenie spravovať VIP kontakty.', 'Prístup zamietnutý', ['response' => 403]);
+    }
+    if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_ppvipnonce'] ?? '')), 'pp_vip_panel')) {
+        wp_die('Formulár vypršal. Vráťte sa do realitného panela, obnovte stránku a skúste to znova.', 'Neplatný formulár', ['response' => 403]);
+    }
+    if (!function_exists('zcn_table') || !function_exists('zcn_add_contact')) {
+        pp_vip_panel_notice_set('Plugin ZC VIP nie je aktívny alebo je zastaraný.', false);
+        pp_go(pp_panel_url('action=newsletter&sub=subscribers'));
+    }
+    if (function_exists('zcn_ensure_table_ready') && !zcn_ensure_table_ready()) {
+        pp_vip_panel_notice_set('VIP databáza nie je dostupná. Skúste plugin ZC VIP deaktivovať a znovu aktivovať.', false);
+        pp_go(pp_panel_url('action=newsletter&sub=subscribers'));
+    }
+
+    global $wpdb;
+    $table = zcn_table();
+    $op = sanitize_key($_POST['vip_operation'] ?? '');
+    $message = 'Neznáma operácia.';
+    $ok = false;
+
+    if ($op === 'add') {
+        [$message, $ok] = zcn_add_contact(
+            wp_unslash($_POST['email'] ?? ''),
+            sanitize_text_field(wp_unslash($_POST['name'] ?? '')),
+            pp_nl_interests_value($_POST['interest'] ?? ''),
+            sanitize_key($_POST['add_mode'] ?? 'active'),
+            'manual_panel'
+        );
+    } elseif ($op === 'batch') {
+        if (!function_exists('zcn_add_contacts_bulk') || !function_exists('zcn_bulk_notice')) {
+            $message = 'Aktualizujte plugin ZC VIP – hromadné pridanie potrebuje novšiu verziu.';
+        } else {
+            $counts = zcn_add_contacts_bulk(
+                wp_unslash($_POST['batch_contacts'] ?? ''),
+                pp_nl_interests_value($_POST['batch_interest'] ?? ''),
+                'manual_batch',
+                sanitize_key($_POST['batch_mode'] ?? 'active')
+            );
+            [$message, $ok] = zcn_bulk_notice($counts);
+        }
+    } else {
+        $subscriber_id = absint($_POST['subscriber_id'] ?? 0);
+        $subscriber = $subscriber_id ? $wpdb->get_row($wpdb->prepare(
+            "SELECT id, status FROM {$table} WHERE id=%d",
+            $subscriber_id
+        )) : null;
+
+        if (!$subscriber) {
+            $message = 'VIP kontakt sa v databáze nenašiel.';
+        } elseif ($op === 'interest') {
+            $saved = $wpdb->update(
+                $table,
+                ['interest' => pp_nl_interests_value($_POST['interest'] ?? '')],
+                ['id' => $subscriber_id]
+            );
+            $ok = ($saved !== false);
+            $message = $ok ? 'Kategórie kontaktu boli uložené.' : 'Kategórie sa nepodarilo uložiť.';
+        } elseif ($op === 'unsubscribe') {
+            $saved = $wpdb->update($table, ['status' => 'unsubscribed'], ['id' => $subscriber_id]);
+            $ok = ($saved !== false);
+            $message = $ok ? 'Kontakt bol odhlásený z VIP.' : 'Kontakt sa nepodarilo odhlásiť.';
+        } elseif ($op === 'delete') {
+            $deleted = $wpdb->delete($table, ['id' => $subscriber_id]);
+            $ok = ($deleted !== false && $deleted > 0);
+            $message = $ok ? 'Kontakt bol natrvalo vymazaný.' : 'Kontakt sa nepodarilo vymazať.';
+        } elseif ($op === 'resend') {
+            if (!function_exists('zcn_resend_confirmation')) {
+                $message = 'Aktualizujte plugin ZC VIP – odoslanie pozvánky potrebuje novšiu verziu.';
+            } else {
+                $result = zcn_resend_confirmation($subscriber_id, 'manual_panel');
+                $ok = !is_wp_error($result);
+                $message = $ok
+                    ? 'Bola odoslaná nová VIP pozvánka na potvrdenie.'
+                    : $result->get_error_message();
+            }
+        }
+    }
+
+    if (!$ok && $wpdb->last_error) {
+        error_log('Property Manager Pro VIP: ' . $wpdb->last_error);
+        if ($message === 'Neznáma operácia.') {
+            $message = 'VIP databáza požiadavku nespracovala. Skúste to znova alebo skontrolujte ZC VIP.';
+        }
+    }
+    pp_vip_panel_notice_set($message, $ok);
+    pp_go(pp_panel_url('action=newsletter&sub=subscribers'));
+}
+add_action('admin_post_' . PP_VIP_PANEL_ACTION, 'pp_vip_panel_post_endpoint');
+
 function panel_newsletter() {
     if (!function_exists('zcn_table')) {
-        echo '<div style="padding:40px;text-align:center;color:#e74c3c">Plugin ZC Newsletter nie je nainštalovaný.</div>';
+        echo '<div style="padding:40px;text-align:center;color:#e74c3c">Plugin ZC VIP nie je nainštalovaný.</div>';
         return;
     }
     // Kategórie odberateľov pribudli v novšej verzii pluginu. Bez nej by
     // panel spadol na neznámej funkcii, preto to radšej povieme zrozumiteľne.
     if (!pp_nl_has_interests()) {
         echo '<div style="padding:36px;text-align:center;color:#b45309;line-height:1.7">'
-           . '<strong>Plugin ZC Newsletter je v staršej verzii.</strong><br>'
-           . 'Nahraj jeho aktuálny balík (Pluginy → Pridať nový → Nahrať plugin) a Newsletter tu bude fungovať v plnom rozsahu.'
+           . '<strong>Plugin ZC VIP je v staršej verzii.</strong><br>'
+           . 'Nahraj jeho aktuálny balík (Pluginy → Pridať nový → Nahrať plugin) a VIP tu bude fungovať v plnom rozsahu.'
            . '</div>';
         return;
     }
@@ -1904,6 +2151,11 @@ function panel_newsletter() {
     $subtab = sanitize_text_field($_GET['sub'] ?? 'send');
     $subscriber_notice = '';
     $subscriber_notice_ok = false;
+    $stored_notice = pp_vip_panel_notice_take();
+    if ($stored_notice) {
+        $subscriber_notice = (string) ($stored_notice['message'] ?? '');
+        $subscriber_notice_ok = !empty($stored_notice['ok']);
+    }
 
     // Handle delete/unsub from panel
     if (isset($_POST['pnl_nadd']) && wp_verify_nonce($_POST['_pnlnonce'] ?? '', 'pnl_nl')) {
@@ -1915,7 +2167,7 @@ function panel_newsletter() {
             [$subscriber_notice, $subscriber_notice_ok] =
                 zcn_add_contact($add_email, $add_name, $add_interest, $add_mode, 'manual_panel');
         } else {
-            $subscriber_notice = 'Plugin ZC Newsletter neponúka pridanie kontaktu – aktualizuj ho na najnovšiu verziu.';
+            $subscriber_notice = 'Plugin ZC VIP neponúka pridanie kontaktu – aktualizuj ho na najnovšiu verziu.';
         }
     }
     if (isset($_POST['pnl_nbatch']) && wp_verify_nonce($_POST['_pnlnonce'] ?? '', 'pnl_nl')) {
@@ -1927,7 +2179,7 @@ function panel_newsletter() {
         if (!$batch['contacts']) {
             $subscriber_notice = 'Nenašiel sa žiadny platný kontakt. Použite jeden riadok na osobu: Meno;Priezvisko;email.';
         } elseif (!function_exists('zcn_upsert_manual_active')) {
-            $subscriber_notice = 'Aktualizujte aj plugin ZC Newsletter – hromadné pridanie potrebuje jeho novú verziu.';
+            $subscriber_notice = 'Aktualizujte aj plugin ZC VIP – hromadné pridanie potrebuje jeho novú verziu.';
         } else {
             foreach ($batch['contacts'] as $contact) {
                 $result = ($batch_mode === 'pending' && function_exists('zcn_subscribe_direct'))
@@ -1959,7 +2211,7 @@ function panel_newsletter() {
                 $subscriber_notice .= ' Naraz sa spracuje najviac 500 riadkov; zvyšok vložte v ďalšej dávke.';
             }
             $subscriber_notice .= ($batch_mode === 'pending')
-                ? ' Každému odišiel potvrdzovací e-mail.'
+                ? ' Každému odišla VIP pozvánka na potvrdenie.'
                 : ' Potvrdzovacie ani uvítacie e-maily sa neposielali.';
             $subscriber_notice_ok = ($counts['created'] + $counts['reactivated'] + $counts['updated']) > 0
                 && $counts['failed'] === 0;
@@ -1967,7 +2219,7 @@ function panel_newsletter() {
     }
     if (isset($_POST['pnl_nsub']) && wp_verify_nonce($_POST['_pnlnonce'],'pnl_nl')) {
         $wpdb->update($table, ['status'=>'unsubscribed'], ['id'=>intval($_POST['pnl_nsub'])]);
-        $subscriber_notice = 'Kontakt bol odhlásený z newslettera.';
+        $subscriber_notice = 'Kontakt bol odhlásený z VIP.';
         $subscriber_notice_ok = true;
     }
     if (isset($_POST['pnl_ndel']) && wp_verify_nonce($_POST['_pnlnonce'],'pnl_nl')) {
@@ -1988,11 +2240,11 @@ function panel_newsletter() {
             if (is_wp_error($result)) {
                 $subscriber_notice = $result->get_error_message();
             } else {
-                $subscriber_notice = 'Bol odoslaný nový potvrdzovací e-mail.';
+                $subscriber_notice = 'Bola odoslaná nová VIP pozvánka na potvrdenie.';
                 $subscriber_notice_ok = true;
             }
         } else {
-            $subscriber_notice = 'Aktualizujte aj plugin ZC Newsletter – bezpečné opätovné odoslanie potrebuje jeho novú verziu.';
+            $subscriber_notice = 'Aktualizujte aj plugin ZC VIP – bezpečné opätovné odoslanie potrebuje jeho novú verziu.';
         }
     }
     // Uloženie šablóny „Nová ponuka"
@@ -2061,7 +2313,7 @@ function panel_newsletter() {
         <?php if (!empty($blast_saved)): ?>
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;padding:12px 16px;border-radius:8px;margin-bottom:18px;font-size:14px">Šablóna uložená.</div>
         <?php endif; ?>
-        <p style="color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.6">Takto vyzerá e-mail, ktorý sa odošle odberateľom po kliknutí na <strong>„Poslať odberateľom newslettera"</strong> pri ponuke. Uprav si úvodný text, záver aj kontakt. Môžeš použiť premennú <code style="background:var(--section);padding:1px 6px;border-radius:4px">{meno}</code>.</p>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.6">Takto vyzerá e-mail, ktorý sa odošle po kliknutí na <strong>„Poslať VIP odberateľom"</strong> pri ponuke. Uprav si úvodný text, záver aj kontakt. Môžeš použiť premennú <code style="background:var(--section);padding:1px 6px;border-radius:4px">{meno}</code>.</p>
         <form method="post">
             <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
             <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:24px">
@@ -2137,7 +2389,7 @@ function panel_newsletter() {
                 <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Obsah *</label>
                 <?php
                 if (function_exists('zc_render_editor_tools')) {
-                    zc_render_editor_tools('pnlBody', ['template'=>'newsletter','label'=>'Obsah newslettera']);
+                    zc_render_editor_tools('pnlBody', ['template'=>'newsletter','label'=>'Obsah VIP e-mailu']);
                 }
                 wp_editor('', 'pnlBody', pp_panel_editor_settings('pnl_body', 18));
                 ?>
@@ -2279,7 +2531,7 @@ function panel_newsletter() {
         if (!data) return;
         var t = document.getElementById('pnlTestEmail').value.trim();
         if (isTest && !t) { alert('Zadajte testovací e-mail.'); return; }
-        if (!isTest && !confirm('Odoslať newsletter '+document.getElementById('pnlNlCount').textContent+' odberateľom?')) return;
+        if (!isTest && !confirm('Odoslať VIP e-mail '+document.getElementById('pnlNlCount').textContent+' odberateľom?')) return;
         if (isTest && t) data.append('test_email', t);
         fetch('<?php echo admin_url('admin-ajax.php') ?>',{method:'POST',body:data})
         .then(r=>r.json()).then(res=>{ pnlNlMsg(res.data.message, res.success); });
@@ -2337,9 +2589,8 @@ function panel_newsletter() {
 
     <details class="pnl-subscriber-add" style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px">
         <summary style="cursor:pointer;font-weight:800;color:var(--dark);font-size:14px">＋ Pridať odberateľa ručne</summary>
-        <form method="post" class="pnl-subscriber-add-form" style="display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:15px">
-            <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-            <input type="hidden" name="pnl_nadd" value="1">
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" class="pnl-subscriber-add-form" style="display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:15px">
+            <?php pp_vip_panel_form_fields('add') ?>
             <label style="font-size:11px;font-weight:700;color:var(--muted)">Meno
                 <input type="text" name="name" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:7px">
             </label>
@@ -2352,7 +2603,7 @@ function panel_newsletter() {
             <label style="font-size:11px;font-weight:700;color:var(--muted)">Spôsob pridania
                 <select name="add_mode" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:7px">
                     <option value="active">Aktívny – pridať priamo</option>
-                    <option value="pending">Poslať potvrdenie e-mailom</option>
+                    <option value="pending">Poslať pozvánku na potvrdenie VIP</option>
                 </select>
             </label>
             <button type="submit" class="btn btn-primary" style="min-height:42px">Pridať</button>
@@ -2362,9 +2613,8 @@ function panel_newsletter() {
 
     <details class="pnl-subscriber-add" style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px">
         <summary style="cursor:pointer;font-weight:800;color:var(--dark);font-size:14px">＋ Pridať viac ľudí naraz</summary>
-        <form method="post" class="pnl-subscriber-batch-form" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(190px,.8fr);gap:14px;align-items:end;margin-top:15px">
-            <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-            <input type="hidden" name="pnl_nbatch" value="1">
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" class="pnl-subscriber-batch-form" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(190px,.8fr);gap:14px;align-items:end;margin-top:15px">
+            <?php pp_vip_panel_form_fields('batch') ?>
             <label style="font-size:11px;font-weight:700;color:var(--muted)">Kontakty – jeden človek na riadok
                 <textarea name="batch_contacts" rows="8" required spellcheck="false" style="display:block;width:100%;margin-top:5px;padding:11px;border:1px solid var(--border);border-radius:7px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;line-height:1.55" placeholder="Meno;Priezvisko;email@example.sk&#10;Jana;Nováková;jana@example.sk"></textarea>
             </label>
@@ -2375,7 +2625,7 @@ function panel_newsletter() {
                 <label style="font-size:11px;font-weight:700;color:var(--muted)">Spôsob pridania
                     <select name="batch_mode" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:7px">
                         <option value="active">Pridať priamo, bez potvrdenia</option>
-                        <option value="pending">Poslať potvrdzovací e-mail</option>
+                        <option value="pending">Poslať každému pozvánku na potvrdenie VIP</option>
                     </select>
                 </label>
                 <button type="submit" class="btn btn-primary" style="min-height:44px">Pridať celú dávku</button>
@@ -2442,9 +2692,9 @@ function panel_newsletter() {
             <td data-label="E-mail" style="padding:11px 16px;color:var(--dark);font-weight:600"><?php echo esc_html($r->email) ?></td>
             <td data-label="Meno" style="padding:11px 16px;color:var(--muted)"><?php echo esc_html($r->name ?: '–') ?></td>
             <td data-label="Kategória" style="padding:11px 16px">
-                <form method="post" style="display:flex;gap:5px">
-                    <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-                    <input type="hidden" name="pnl_ninterest" value="<?php echo (int) $r->id ?>">
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" style="display:flex;gap:5px">
+                    <?php pp_vip_panel_form_fields('interest') ?>
+                    <input type="hidden" name="subscriber_id" value="<?php echo (int) $r->id ?>">
                     <div style="min-width:170px"><?php pp_nl_multiselect('interest', $r->interest ?? '', ['empty' => 'Všetko', 'compact' => true]) ?></div>
                     <button class="btn btn-ghost" style="padding:5px 8px" title="Uložiť">✓</button>
                 </form>
@@ -2454,21 +2704,21 @@ function panel_newsletter() {
             <td data-label="Pridaný" style="padding:11px 16px;color:var(--muted);font-size:12px"><?php echo esc_html(date_i18n('d.m.Y H:i', strtotime($r->subscribed_at))) ?></td>
             <td data-label="Akcie" class="pnl-subs-actions" style="padding:11px 16px;white-space:nowrap">
                 <?php if ($r->status === 'active'): ?>
-                <form method="post" style="display:inline" onsubmit="return confirm('Odhlásiť odberateľa?')">
-                    <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-                    <input type="hidden" name="pnl_nsub" value="<?php echo $r->id ?>">
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" style="display:inline" onsubmit="return confirm('Odhlásiť odberateľa?')">
+                    <?php pp_vip_panel_form_fields('unsubscribe') ?>
+                    <input type="hidden" name="subscriber_id" value="<?php echo (int) $r->id ?>">
                     <button type="submit" style="padding:5px 10px;background:var(--section);border:1px solid var(--border);border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">Odhlásiť</button>
                 </form>
                 <?php else: ?>
-                <form method="post" style="display:inline" onsubmit="return confirm('Odoslať nový potvrdzovací e-mail?')">
-                    <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-                    <input type="hidden" name="pnl_nconfirm" value="<?php echo $r->id ?>">
-                    <button type="submit" style="padding:5px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">Poslať potvrdenie</button>
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" style="display:inline" onsubmit="return confirm('Odoslať novú VIP pozvánku na potvrdenie?')">
+                    <?php pp_vip_panel_form_fields('resend') ?>
+                    <input type="hidden" name="subscriber_id" value="<?php echo (int) $r->id ?>">
+                    <button type="submit" style="padding:5px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">Poslať VIP pozvánku</button>
                 </form>
                 <?php endif; ?>
-                <form method="post" style="display:inline" onsubmit="return confirm('Natrvalo vymazať?')">
-                    <?php wp_nonce_field('pnl_nl','_pnlnonce') ?>
-                    <input type="hidden" name="pnl_ndel" value="<?php echo $r->id ?>">
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" style="display:inline" onsubmit="return confirm('Natrvalo vymazať?')">
+                    <?php pp_vip_panel_form_fields('delete') ?>
+                    <input type="hidden" name="subscriber_id" value="<?php echo (int) $r->id ?>">
                     <button type="submit" style="padding:5px 10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--sans)">Vymazať</button>
                 </form>
             </td>
@@ -2534,7 +2784,7 @@ function panel_newsletter() {
     </table>
     </div>
     <?php else: ?>
-    <div style="padding:48px;text-align:center;color:var(--muted)">Zatiaľ nebol odoslaný žiadny newsletter.</div>
+    <div style="padding:48px;text-align:center;color:var(--muted)">Zatiaľ nebol odoslaný žiadny VIP e-mail.</div>
     <?php endif; ?>
     <?php endif; ?>
     <?php
@@ -2612,10 +2862,6 @@ function zcr_panel_handle_post() {
             'avatar_url'  => esc_url_raw($_POST['avatar_url'] ?? ''),
             'published'   => empty($_POST['published']) ? 0 : 1,
         ];
-        // Zdroj recenzie (vlastná / Google) – starší plugin recenzií ho nepozná
-        if (function_exists('zcr_ensure_source_column') && zcr_ensure_source_column()) {
-            $data['source'] = zcr_sanitize_source($_POST['source'] ?? 'own');
-        }
         if ($id) {
             zcr_audit_snapshot($id);
             $r = $wpdb->update($t, $data, ['id' => $id]);
@@ -2772,7 +3018,6 @@ function panel_reviews() {
         $f_body   = $cur ? $cur->body        : '';
         $f_rating = $cur ? (int) $cur->rating : 5;
         $f_pub    = $cur ? (int) $cur->published : 1;
-        $f_src    = ($cur && !empty($cur->source)) ? $cur->source : 'own';
     ?>
     <form method="post" action="<?php echo esc_url($endpoint) ?>" class="rev-form-card">
         <?php zcr_panel_form_fields($cur ? (int) $cur->id : 0); ?>
@@ -2807,18 +3052,6 @@ function panel_reviews() {
                 </div>
             </div>
 
-            <?php if (function_exists('zcr_sources')): ?>
-            <label class="rev-f">
-                <span class="rev-f-lbl">Zdroj recenzie</span>
-                <select name="source">
-                    <?php foreach (zcr_sources() as $sk => $sl): ?>
-                    <option value="<?php echo esc_attr($sk) ?>" <?php selected($f_src, $sk) ?>><?php echo esc_html($sl) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <small style="color:var(--muted);font-size:11.5px">Pri „Google" sa na webe ukáže značka „Recenzia z Google". Text skopíruj z Google profilu.</small>
-            </label>
-            <?php endif; ?>
-
             <label class="rev-check">
                 <input type="checkbox" name="published" value="1" <?php checked($f_pub, 1) ?>>
                 <span>Zobraziť na webe</span>
@@ -2848,7 +3081,6 @@ function panel_reviews() {
                     <?php if ($r->author_role): ?><span class="rev-role"><?php echo esc_html($r->author_role) ?></span><?php endif; ?>
                     <span class="rev-stars"><?php echo str_repeat('★', (int) $r->rating) . str_repeat('☆', 5 - (int) $r->rating) ?></span>
                     <span class="rev-badge <?php echo $r->published ? 'on' : 'off' ?>"><?php echo $r->published ? 'Na webe' : 'Skrytá' ?></span>
-                    <?php if (($r->source ?? '') === 'google'): ?><span class="rev-badge" style="background:#e8f0fe;color:#1a56b8">Google</span><?php endif; ?>
                 </div>
                 <div class="rev-row-body"><?php echo esc_html($r->body) ?></div>
             </div>

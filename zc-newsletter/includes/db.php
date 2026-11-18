@@ -199,8 +199,9 @@ function zcn_interest_sql_where($interest) {
 
 function zcn_source_labels() {
     return [
-        'newsletter_page' => 'Stránka Newsletter',
-        'newsletter'      => 'Newsletter formulár',
+        'vip_page'        => 'Stránka VIP',
+        'newsletter_page' => 'Pôvodná stránka Newsletter',
+        'newsletter'      => 'VIP formulár',
         'kontakt'         => 'Kontaktný formulár',
         'odhad'           => 'Formulár Odhad',
         'ponuka'          => 'Detail ponuky',

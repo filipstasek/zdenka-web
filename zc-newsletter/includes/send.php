@@ -66,7 +66,7 @@ function zcn_handle_send() {
                         'created' => current_time('mysql'), 'at' => $schedule_at];
         update_option('zcn_scheduled', $queue);
         wp_schedule_single_event($ts, 'zcn_do_scheduled', [$key]);
-        wp_send_json_success(['message' => 'Newsletter naplánovaný na ' . esc_html($schedule_at) . '.']);
+        wp_send_json_success(['message' => 'VIP e-mail naplánovaný na ' . esc_html($schedule_at) . '.']);
     }
 
     global $wpdb;

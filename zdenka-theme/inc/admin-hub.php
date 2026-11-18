@@ -246,7 +246,7 @@ function zc_hub_page() {
         <div class="zch-sec"><h2>Najčastejšie úlohy</h2><span>Rýchly prístup</span></div>
         <div class="zch-grid zch-grid-main">
             <?php
-            zc_hub_card('Realitný panel', 'Ponuky, formuláre, recenzie a newsletter v jednoduchom rozhraní.', $purl, '⌂', (bool) $panel, 'is-primary', 'Rozhranie pre maklérku');
+            zc_hub_card('Realitný panel', 'Ponuky, formuláre, recenzie a VIP komunikácia v jednoduchom rozhraní.', $purl, '⌂', (bool) $panel, 'is-primary', 'Rozhranie pre maklérku');
             zc_hub_card('Pridať ponuku', 'Vytvoriť novú nehnuteľnosť vrátane fotiek a ceny.', admin_url('post-new.php?post_type=property'), '＋', post_type_exists('property'), '', 'Nová nehnuteľnosť');
             zc_hub_card('Vzhľad a texty', 'Kontakty, fotografie, farby a textové nastavenia webu.', admin_url('customize.php'), '🎨', true, '', 'Prispôsobiť tému');
             zc_hub_card('Google Site Kit', 'Návštevnosť, vyhľadávanie a výsledky webu.', admin_url('admin.php?page=googlesitekit-dashboard'), 'G', $sitekit, '', $sitekit ? 'Štatistiky Google' : '');
@@ -261,7 +261,7 @@ function zc_hub_page() {
             zc_hub_card('Stránky webu', 'Úvod, kontakt, o mne a ďalšie verejné stránky.', admin_url('edit.php?post_type=page'), '▤', true);
             zc_hub_card('Priečinky fotiek', 'Médiá automaticky roztriedené podľa ponúk.', admin_url('edit-tags.php?taxonomy=zc_media_folder'), '📁', taxonomy_exists('zc_media_folder'));
             zc_hub_card('Recenzie', 'Referencie klientov a ich poradie na webe.', admin_url('admin.php?page=zc-reviews'), '★', zc_hub_has('zc-reviews'));
-            zc_hub_card('Newsletter', 'Odberatelia, kampane a rozposielanie ponúk.', admin_url('admin.php?page=zc-newsletter'), '✉', zc_hub_has('zc-newsletter'));
+            zc_hub_card('VIP', 'Odberatelia, kategórie záujmu a rozposielanie ponúk.', admin_url('admin.php?page=zc-newsletter'), '✉', zc_hub_has('zc-newsletter'));
             zc_hub_card('Ebook', 'PDF lead-magnet a kontakty z jeho formulára.', admin_url('admin.php?page=zc-ebook'), '📘', zc_hub_has('zc-ebook'));
             zc_hub_card('Formuláre a dopyty', 'Kontakty z webu, poznámky, stav komunikácie a stránky.', $purl ? add_query_arg('action', 'leads', $purl) : '', '☏', (bool) $purl, '', $new_leads ? $new_leads . ' nových' : 'Všetko vybavené');
             zc_hub_card('Breakdance – texty', 'Vizuálna úprava nadpisov a textov na stránkach.', admin_url('edit.php?post_type=page'), 'B', $breakdance, '', $breakdance_pages . ' stránok v Breakdance');
@@ -314,6 +314,7 @@ function zc_hub_page() {
             <?php
             zc_hub_card('Google Site Kit', 'Analytics, Search Console a PageSpeed na jednom mieste.', admin_url('admin.php?page=googlesitekit-dashboard'), 'G', $sitekit, '', $sitekit ? 'Plugin je aktívny' : '');
             zc_hub_card('Indexovanie', 'Prečo web nie je v Google – presmerovania, sitemap.', admin_url('admin.php?page=zc-indexovanie'), '🔎', true);
+            zc_hub_card('Recenzie z Google', 'Napojenie Places API a synchronizácia hodnotení.', admin_url('admin.php?page=zc-reviews-google'), '★', zc_hub_has('zc-reviews-google'));
             zc_hub_card('Nastavenie merania', 'GTM, adresa, súradnice a miestne SEO.', admin_url('customize.php?autofocus[section]=zc_localseo'), '⌖', true, '', $gtm ? 'GTM je nastavený' : 'Skontrolovať GTM');
             ?>
         </div>
@@ -354,7 +355,7 @@ function zc_hub_notify_page() {
     echo '<div class="wrap zch"><div class="zch-head"><h1>Notifikácie z formulárov</h1></div>';
     echo '<div class="zch-note" style="margin-bottom:20px">Tu určíš, komu prídu e-maily z kontaktu, odhadu a ebooku.
           Bez tohto nastavenia chodia na administrátorský e-mail webu – teda každému účtu s tou istou adresou.
-          <strong>Odberateľov newslettera sa to netýka, tým sa nič neposiela automaticky.</strong></div>';
+          <strong>VIP odberateľov sa to netýka, tým sa nič neposiela automaticky.</strong></div>';
     echo function_exists('zc_notify_settings_box') ? zc_notify_settings_box() : '';
     echo '</div>';
 }
@@ -558,7 +559,7 @@ function zc_hub_tools_page() {
             $plugins = [
                 'Property Manager Pro' => defined('PROPERTY_PRO_PATH'),
                 'ZC Recenzie'          => function_exists('zcr_table'),
-                'ZC Newsletter'        => function_exists('zcn_table'),
+                'ZC VIP'               => function_exists('zcn_table'),
                 'ZC Ebook'             => function_exists('zc_ebook_enabled'),
             ];
             foreach ($plugins as $name => $active): ?>

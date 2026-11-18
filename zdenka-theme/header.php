@@ -51,9 +51,9 @@
             <a href="<?php echo home_url('/referencie/'); ?>"
                <?php echo is_page('referencie') ? 'class="active"' : ''; ?>>Referencie</a>
             <?php endif; ?>
-            <?php if (shortcode_exists('zc_newsletter_full')): ?>
-            <a href="<?php echo home_url('/newsletter/'); ?>"
-               <?php echo is_page('newsletter') ? 'class="active"' : ''; ?>>Newsletter</a>
+            <?php if (shortcode_exists('zc_vip')): ?>
+            <a href="<?php echo home_url('/vip/'); ?>"
+               <?php echo is_page('vip') ? 'class="active"' : ''; ?>>VIP</a>
             <?php endif; ?>
             <?php if (function_exists('zc_ebook_enabled') && zc_ebook_enabled()): zc_ebook_flag(true); ?>
             <a href="#" data-zc-ebook-open class="zc-nav-ebook">Ebook</a>
@@ -85,9 +85,9 @@
         <?php endforeach; ?>
         <a href="<?php echo home_url('/referencie/'); ?>"
            style="<?php echo is_page('referencie') ? 'color:var(--accent-txt);font-weight:700' : ''; ?>">Referencie</a>
-        <?php if (shortcode_exists('zc_newsletter_full')): ?>
-        <a href="<?php echo home_url('/newsletter/'); ?>"
-           style="<?php echo is_page('newsletter') ? 'color:var(--accent-txt);font-weight:700' : ''; ?>">Newsletter</a>
+        <?php if (shortcode_exists('zc_vip')): ?>
+        <a href="<?php echo home_url('/vip/'); ?>"
+           style="<?php echo is_page('vip') ? 'color:var(--accent-txt);font-weight:700' : ''; ?>">VIP</a>
         <?php endif; ?>
         <?php if (function_exists('zc_ebook_enabled') && zc_ebook_enabled()): zc_ebook_flag(true); ?>
         <a href="#" data-zc-ebook-open style="color:var(--accent-txt);font-weight:700">EBOOK</a>

@@ -71,7 +71,12 @@ function zc_ajax_property_grid() {
 
 // ── PROPERTY GRID shortcode ───────────────────────────────────────────────
 add_shortcode('property_grid', function($atts) {
-    $atts = shortcode_atts(['per_page' => '24'], $atts);
+    $atts = shortcode_atts([
+        'per_page' => '24',
+        // Hodnota 4 = bežná mriežka do štyroch kariet, nad štyri carousel.
+        'carousel' => '0',
+    ], $atts);
+    $carousel_threshold = max(0, intval($atts['carousel']));
 
     // Get all cities for filter dropdown
     $all_cities = [];
@@ -107,14 +112,30 @@ add_shortcode('property_grid', function($atts) {
     .zc-filter-reset:hover{color:var(--dark,#1C1A18);border-color:#ccc}
     .zc-filter-count{font-size:13px;color:var(--muted,#6B6560);font-family:var(--sans,sans-serif);padding-bottom:2px;white-space:nowrap}
     .property-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+    .zc-prop-badge.pp-custom-badge{background:var(--pp-badge-bg)!important;color:var(--pp-badge-fg)!important}
+    .zc-grid-stage{position:relative}
+    .zc-carousel-controls{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin:0 0 14px}
+    .zc-carousel-controls[hidden]{display:none!important}
+    .zc-carousel-status{min-width:76px;text-align:center;font-size:12px;font-weight:700;color:var(--muted,#6B6560);font-family:var(--sans,sans-serif)}
+    .zc-carousel-arrow{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--border,#E2DACE);border-radius:50%;background:#fff;color:var(--dark,#1C1A18);font-size:22px;line-height:1;cursor:pointer;box-shadow:0 3px 12px rgba(28,26,24,.07);transition:background .2s,border-color .2s,opacity .2s}
+    .zc-carousel-arrow:hover:not(:disabled){background:var(--section,#F5F1EA);border-color:var(--accent,#B8A47A)}
+    .zc-carousel-arrow:disabled{opacity:.32;cursor:default}
+    .property-grid.zc-property-carousel{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;padding:2px 2px 8px}
+    .property-grid.zc-property-carousel::-webkit-scrollbar{display:none}
+    .property-grid.zc-property-carousel>.zc-prop-card{flex:0 0 calc((100% - 72px)/4);min-width:0;scroll-snap-align:start}
     .zc-grid-loading{opacity:.5;pointer-events:none;transition:opacity .2s}
+    @media(max-width:1100px){.property-grid.zc-property-carousel>.zc-prop-card{flex-basis:calc((100% - 48px)/3)}}
     @media(max-width:768px){
         .zc-filters{padding:16px}
         .zc-filter-group{min-width:calc(50% - 6px)}
+        .property-grid.zc-property-carousel>.zc-prop-card{flex-basis:calc((100% - 24px)/2)}
     }
     @media(max-width:480px){
         .zc-filter-group{min-width:100%}
+        .property-grid.zc-property-carousel>.zc-prop-card{flex-basis:100%}
+        .zc-carousel-controls{justify-content:center}
     }
+    @media(prefers-reduced-motion:reduce){.property-grid.zc-property-carousel{scroll-behavior:auto}}
     </style>
 
     <div id="<?php echo $uid ?>_wrap">
@@ -124,9 +145,7 @@ add_shortcode('property_grid', function($atts) {
                 <span class="zc-filter-label">Typ ponuky</span>
                 <select class="zc-filter-select" id="<?php echo $uid ?>_typ">
                     <option value="">Všetky</option>
-                    <option value="predaj">Na predaj</option>
-                    <option value="prenajom">Na prenájom</option>
-                    <option value="pozemok">Pozemok</option>
+                    <?php foreach (pp_property_types() as $value=>$label): ?><option value="<?php echo esc_attr($value) ?>"><?php echo esc_html($label) ?></option><?php endforeach; ?>
                 </select>
             </div>
             <div class="zc-filter-group">
@@ -162,6 +181,14 @@ add_shortcode('property_grid', function($atts) {
         </div>
 
         <!-- GRID -->
+        <div class="zc-grid-stage">
+        <?php if ($carousel_threshold): ?>
+        <div class="zc-carousel-controls" id="<?php echo $uid ?>_controls" hidden>
+            <button type="button" class="zc-carousel-arrow" id="<?php echo $uid ?>_prev" aria-label="Predchádzajúce ponuky">‹</button>
+            <span class="zc-carousel-status" id="<?php echo $uid ?>_status" aria-live="polite"></span>
+            <button type="button" class="zc-carousel-arrow" id="<?php echo $uid ?>_next" aria-label="Ďalšie ponuky">›</button>
+        </div>
+        <?php endif; ?>
         <div class="property-grid" id="<?php echo $uid ?>_grid">
         <?php
         if ($init_query->have_posts()) {
@@ -175,6 +202,7 @@ add_shortcode('property_grid', function($atts) {
         wp_reset_postdata();
         ?>
         </div>
+        </div>
     </div>
 
     <script>
@@ -184,6 +212,54 @@ add_shortcode('property_grid', function($atts) {
         var grid  = document.getElementById(uid + '_grid');
         var count = document.getElementById(uid + '_count');
         var perPage = <?php echo intval($atts['per_page']) ?>;
+        var carouselThreshold = <?php echo $carousel_threshold ?>;
+        var carouselControls = document.getElementById(uid + '_controls');
+        var carouselPrev = document.getElementById(uid + '_prev');
+        var carouselNext = document.getElementById(uid + '_next');
+        var carouselStatus = document.getElementById(uid + '_status');
+
+        function carouselCards() {
+            return Array.prototype.slice.call(grid.querySelectorAll('.zc-prop-card'));
+        }
+
+        function updateCarouselControls() {
+            if (!grid.classList.contains('zc-property-carousel')) return;
+            var cards = carouselCards();
+            var max = Math.max(0, grid.scrollWidth - grid.clientWidth);
+            if (carouselPrev) carouselPrev.disabled = grid.scrollLeft <= 3;
+            if (carouselNext) carouselNext.disabled = grid.scrollLeft >= max - 3;
+            if (carouselStatus && cards.length) {
+                var first = 0;
+                var viewportLeft = grid.getBoundingClientRect().left;
+                var best = Infinity;
+                cards.forEach(function(card, index) {
+                    var distance = Math.abs(card.getBoundingClientRect().left - viewportLeft);
+                    if (distance < best) { best = distance; first = index; }
+                });
+                var visible = Math.max(1, Math.round(grid.clientWidth / Math.max(1, cards[0].getBoundingClientRect().width)));
+                carouselStatus.textContent = (first + 1) + '–' + Math.min(cards.length, first + visible) + ' z ' + cards.length;
+            }
+        }
+
+        function syncCarousel() {
+            var active = carouselThreshold > 0 && carouselCards().length > carouselThreshold;
+            grid.classList.toggle('zc-property-carousel', active);
+            if (carouselControls) carouselControls.hidden = !active;
+            if (!active) grid.scrollLeft = 0;
+            window.requestAnimationFrame(updateCarouselControls);
+        }
+
+        function moveCarousel(direction) {
+            var card = carouselCards()[0];
+            if (!card) return;
+            var gap = parseFloat(window.getComputedStyle(grid).columnGap || window.getComputedStyle(grid).gap) || 24;
+            grid.scrollBy({left: direction * (card.getBoundingClientRect().width + gap), behavior: 'smooth'});
+        }
+
+        if (carouselPrev) carouselPrev.addEventListener('click', function(){ moveCarousel(-1); });
+        if (carouselNext) carouselNext.addEventListener('click', function(){ moveCarousel(1); });
+        grid.addEventListener('scroll', updateCarouselControls, {passive:true});
+        window.addEventListener('resize', syncCarousel, {passive:true});
 
         function getVal(id) {
             var el = document.getElementById(uid + '_' + id);
@@ -214,6 +290,7 @@ add_shortcode('property_grid', function($atts) {
                     if (window.zcMarkFavs) window.zcMarkFavs();
                     if (window.zcRevealImages) window.zcRevealImages(grid);
                     if (window.zcCmpSync) window.zcCmpSync();
+                    syncCarousel();
                 }
                 grid.classList.remove('zc-grid-loading');
             })
@@ -235,6 +312,7 @@ add_shortcode('property_grid', function($atts) {
                 window[uid + '_filter']();
             });
         });
+        syncCarousel();
     })();
     </script>
     <?php
@@ -257,10 +335,11 @@ function render_property_card() {
     $per_m2   = pp_price_per_m2($cena_raw, $plocha);
     $znizena  = pp_price_num($cena_pov) > pp_price_num($cena_raw) && pp_price_num($cena_raw) > 0;
 
-    $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+    $typ_labels = function_exists('pp_property_types') ? pp_property_types($typ) : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
     $typ_label  = $typ_labels[$typ] ?? '';
+    $typ_badge  = function_exists('pp_property_type_badge') ? pp_property_type_badge($typ) : null;
     $sale       = pp_sale_state($id);
-    $sale_badge = pp_sale_badge($sale);
+    $sale_badge = pp_sale_badge($sale, $typ);
 
     ob_start(); ?>
     <div class="zc-prop-card<?php echo $sale === 'predane' ? ' is-sold' : '' ?>">
@@ -279,10 +358,10 @@ function render_property_card() {
             ?>
             </a>
             <div class="zc-prop-badges">
-                <?php if ($typ_label): ?><span class="zc-prop-badge <?php echo esc_attr($typ) ?>"><?php echo $typ_label ?></span><?php endif; ?>
+                <?php if ($typ_label): ?><span class="zc-prop-badge pp-custom-badge <?php echo esc_attr($typ) ?>" style="background:<?php echo esc_attr($typ_badge['bg']??'#B8A47A') ?>!important;color:<?php echo esc_attr($typ_badge['fg']??'#1C1A18') ?>!important;box-shadow:<?php echo esc_attr($typ_badge['shadow']??'0 5px 14px rgba(31,25,18,.28)') ?>!important"><?php echo esc_html($typ_label) ?></span><?php endif; ?>
                 <?php if (pp_is_new($id) && !$sale): ?><span class="zc-prop-badge is-new">Nové</span><?php endif; ?>
                 <?php if ($znizena && !$sale): ?><span class="zc-prop-badge is-reduced">Znížená cena</span><?php endif; ?>
-                <?php if ($sale_badge): ?><span class="zc-prop-badge <?php echo $sale === 'predane' ? 'is-sold' : 'is-reserved' ?>"><?php echo $sale_badge['label'] ?></span><?php endif; ?>
+                <?php if ($sale_badge): ?><span class="zc-prop-badge pp-custom-badge <?php echo $sale === 'predane' ? 'is-sold' : ($sale === 'rezervovane' ? 'is-reserved' : 'is-status') ?>" style="background:<?php echo esc_attr($sale_badge['bg']) ?>!important;color:<?php echo esc_attr($sale_badge['fg']) ?>!important;box-shadow:<?php echo esc_attr($sale_badge['shadow']??'none') ?>!important"><?php echo esc_html($sale_badge['label']) ?></span><?php endif; ?>
             </div>
             <button class="zc-fav-btn" data-id="<?php echo $id ?>" title="Pridať do obľúbených" onclick="zcToggleFav(this,<?php echo $id ?>)">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -349,7 +428,8 @@ add_shortcode('property_carousel', function($atts) {
         if ($cena && strpos($cena,'€')===false) $cena .= ' €';
         $lokalita = get_post_meta($id,'_property_lokalita',true);
         $typ      = get_post_meta($id,'_property_typ',true);
-        $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+        $typ_labels = function_exists('pp_property_types') ? pp_property_types($typ) : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+        $type_badge = function_exists('pp_property_type_badge') ? pp_property_type_badge($typ) : null;
         $slide_attr = [
             'style' => 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover',
             'sizes' => '100vw',
@@ -357,7 +437,7 @@ add_shortcode('property_carousel', function($atts) {
         $img = $cover_id
             ? wp_get_attachment_image($cover_id, 'full', false, $slide_attr)
             : (has_post_thumbnail() ? get_the_post_thumbnail(null, 'full', $slide_attr) : '');
-        $slides[] = ['img'=>$img,'title'=>get_the_title(),'cena'=>$cena,'lokalita'=>$lokalita,'typ'=>$typ_labels[$typ]??'','typ_key'=>$typ,'url'=>get_permalink()];
+        $slides[] = ['img'=>$img,'title'=>get_the_title(),'cena'=>$cena,'lokalita'=>$lokalita,'typ'=>$typ_labels[$typ]??'','typ_key'=>$typ,'type_badge'=>$type_badge,'url'=>get_permalink()];
     }
     wp_reset_postdata();
     $total = count($slides);
@@ -394,7 +474,7 @@ add_shortcode('property_carousel', function($atts) {
             </a>
             <div class="prop-sc-overlay"></div>
             <div class="prop-sc-info">
-                <?php if ($s['typ']): ?><span class="prop-sc-badge <?php echo esc_attr($s['typ_key']) ?>"><?php echo $s['typ'] ?></span><?php endif; ?>
+                <?php if ($s['typ']): ?><span class="prop-sc-badge <?php echo esc_attr($s['typ_key']) ?>" style="background:<?php echo esc_attr($s['type_badge']['bg']??'#B8A47A') ?>!important;color:<?php echo esc_attr($s['type_badge']['fg']??'#1C1A18') ?>!important;box-shadow:<?php echo esc_attr($s['type_badge']['shadow']??'0 6px 18px rgba(0,0,0,.3)') ?>!important"><?php echo esc_html($s['typ']) ?></span><?php endif; ?>
                 <div class="prop-sc-title"><a href="<?php echo $s['url'] ?>"><?php echo esc_html($s['title']) ?></a></div>
                 <div class="prop-sc-meta">
                     <?php if ($s['lokalita']): ?><span><?php echo zc_icon('pin') ?> <?php echo esc_html($s['lokalita']) ?></span><?php endif; ?>
@@ -562,7 +642,7 @@ function pp_ajax_compare() {
         ['_property_stav',      'Stav',        '',   ''],
         ['_property_vlastnictvo','Vlastníctvo','',   ''],
     ];
-    $typ_labels = ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
+    $typ_labels = function_exists('pp_property_types') ? pp_property_types() : ['predaj'=>'Na predaj','prenajom'=>'Na prenájom','pozemok'=>'Pozemok'];
 
     $props = [];
     foreach ($ids as $id) {

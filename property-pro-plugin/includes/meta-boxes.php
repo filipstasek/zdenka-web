@@ -38,14 +38,24 @@ function render_prop_main_meta($post) {
             <label>Typ ponuky</label>
             <select name="prop_typ">
                 <option value="">Vyber...</option>
-                <option value="predaj" <?php selected($f('typ'),'predaj') ?>>Predaj</option>
-                <option value="prenajom" <?php selected($f('typ'),'prenajom') ?>>Prenájom</option>
-                <option value="pozemok" <?php selected($f('typ'),'pozemok') ?>>Pozemok</option>
+                <?php foreach (pp_property_types($f('typ')) as $value=>$label): ?><option value="<?php echo esc_attr($value) ?>" <?php selected($f('typ'),$value) ?>><?php echo esc_html($label) ?></option><?php endforeach; ?>
             </select>
         </div>
         <div class="pm-field">
             <label>Cena</label>
             <input type="text" name="prop_cena" value="<?php echo esc_attr($f('cena')) ?>" placeholder="450 000 €">
+        </div>
+    </div>
+
+    <div class="pm-grid">
+        <div class="pm-field">
+            <label>Stav ponuky</label>
+            <select name="prop_stav_predaja">
+                <option value="">Aktívna</option>
+                <?php foreach (pp_catalog_rows('statuses') as $row): if(!empty($row['hidden'])&&$row['value']!==$f('stav_predaja'))continue; ?>
+                <option value="<?php echo esc_attr($row['value']) ?>" <?php selected($f('stav_predaja'),$row['value']) ?>><?php echo esc_html(pp_sale_label($row['value'],$f('typ'))) ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
     </div>
     
@@ -251,7 +261,7 @@ add_action('save_post_property', function($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
     
-    foreach (['typ','cena','lokalita','mesto','okres','plocha','pozemok','spalne','kupelne','wc','poschodie','rocnik','stav','vlastnictvo','agent_id'] as $f) {
+    foreach (['typ','stav_predaja','cena','lokalita','mesto','okres','plocha','pozemok','spalne','kupelne','wc','poschodie','rocnik','stav','vlastnictvo','agent_id'] as $f) {
         if (isset($_POST['prop_'.$f])) update_post_meta($post_id, '_property_'.$f, sanitize_text_field($_POST['prop_'.$f]));
     }
     if (isset($_POST['prop_popis_kratky'])) {

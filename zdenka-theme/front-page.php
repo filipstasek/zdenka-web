@@ -157,7 +157,7 @@ $zc_hero_portrait_2x = $zc_sized('portrait', 'zc-1440');    // mobil s retinou
         <div><div class="zc-eyebrow"><?php echo zc_t('home.props_eye') ?></div><h2 style="font-family:var(--serif)"><?php echo zc_t('home.props_t') ?> <em><?php echo zc_t('home.props_hl') ?></em></h2></div>
         <a href="<?php echo home_url('/ponuky/'); ?>" class="zc-btn zc-btn-outline"><?php echo zc_t('home.props_all') ?></a>
     </div>
-    <?php echo do_shortcode('[property_grid per_page="3"]'); ?>
+    <?php echo do_shortcode('[property_grid per_page="-1" carousel="4"]'); ?>
 </div>
 </section>
 
@@ -232,7 +232,7 @@ $zc_hero_portrait_2x = $zc_sized('portrait', 'zc-1440');    // mobil s retinou
             </label>
             <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);cursor:pointer;line-height:1.55;margin-bottom:16px">
                 <input type="checkbox" name="newsletter" style="margin-top:2px;accent-color:var(--accent);flex-shrink:0">
-                <span>Chcem dostávať novinky a nové ponuky nehnuteľností na e-mail.</span>
+                <span>Chcem byť vo VIP a dostávať nové ponuky nehnuteľností na e-mail.</span>
             </label>
             <div id="zcFormMsg"></div>
             <button type="submit" class="zc-btn zc-btn-primary" style="width:100%;justify-content:center">Odoslať správu →</button>
